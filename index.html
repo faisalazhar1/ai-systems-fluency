@@ -71,388 +71,605 @@
         <div class="section-heading"><div><p class="section-kicker">THE REFERENCE DECK / 27 CARDS</p><h2>Technical cards.</h2><p>Build fluency with a repeatable chain: <strong>problem → mechanism → metric → trade-off → question.</strong> Explore each card’s explanation, examples and metrics, then use its question in an engineering conversation.</p></div></div>
         <div class="search-wrap"><label for="card-search">Search the deck</label><input id="card-search" type="search" placeholder="Try “KV cache” or “latency”" autocomplete="off"><p id="search-status" role="status" aria-live="polite"></p></div>
         <div class="card-grid" id="card-grid">
-          <article class="card" id="card-1">
-            <span class="card-number">01 / INFERENCE FUNDAMENTALS</span>
-            <h3>Prefill vs Decode</h3>
-            <p class="card-lead">One request, two phases—and two very different performance profiles.</p>
-            <div class="card-flow">PROMPT → PREFILL → KV CACHE → DECODE → TOKENS</div>
-            <div class="card-detail">
-              <h4>What happens</h4>
-              <p><strong>Prefill</strong> processes many input tokens in parallel and builds the KV cache. It often makes heavy use of GPU compute. <strong>Decode</strong> generates tokens one at a time, repeatedly reading prior KV state; it is often constrained by memory bandwidth.</p>
-              <h4>Why it matters</h4>
-              <p>An optimisation can improve one phase without helping the other. A claim like “performance improved 25%” is incomplete without the phase and workload.</p>
-              <p><strong>Watch:</strong> TTFT for the initial response; TPOT for generation pace; output throughput and tokens/second/GPU for capacity and efficiency. Input length, output length and concurrency change the result.</p>
-              <p class="remember">Remember: prefill processes the prompt; decode produces the answer.</p>
-            </div>
-            <p class="question">Which phase improved, at what input/output lengths and concurrency?</p>
+          <article class="card source-card" id="card-1">
+            <h3>Card 1. Prefill vs Decode ⭐⭐⭐</h3>
+            <p><strong>In one sentence</strong></p>
+            <p>An LLM request has two very different phases: <strong>prefill processes the input prompt, while </strong> <strong>decode generates the output tokens one at a time.</strong></p>
+            <h4>Mental model</h4>
+            <p><strong>PROMPT → PREFILL → KV CACHE → DECODE → TOKENS</strong></p>
+            <h4>What&#x27;s actually happening?</h4>
+            <p><strong>Prefill</strong></p>
+            <ul><li>Processes many input tokens in parallel.</li><li>Builds the Key-Value (KV) cache.</li><li>Often makes heavy use of GPU compute.</li></ul>
+            <p><strong>Decode</strong></p>
+            <ul><li>Generates tokens sequentially.</li><li>Constantly reads previously generated KV state.</li><li>Frequently becomes dominated by memory movement/bandwidth rather than pure compute.</li></ul>
+            <h4>Why should I care?</h4>
+            <p>Because an optimisation can improve one phase and do almost nothing for the other.</p>
+            <p>That is why you should be suspicious of:</p>
+            <p>&quot;Performance improved 25%.&quot;</p>
+            <p>Your question becomes:</p>
+            <p><strong>&quot;Which phase improved, prefill or decode, and at what Input Sequence Length, Output </strong> <strong>Sequence Length and concurrency?&quot;</strong></p>
+            <h4>Metrics to connect</h4>
+            <ul><li><strong>Time to First Token (TTFT)</strong> → strongly influenced by prefill.</li><li><strong>Time per Output Token (TPOT)</strong> → decode responsiveness.</li><li><strong>Output throughput</strong> → rate of output-token generation.</li><li><strong>Tokens/second/GPU</strong> → infrastructure efficiency.</li></ul>
+            <h4>Remember</h4>
+            <p><strong>Prefill = understand the prompt. Decode = produce the answer.</strong></p>
           </article>
-          <article class="card" id="card-2">
-            <span class="card-number">02 / INFERENCE FUNDAMENTALS</span>
-            <h3>Compute-bound vs Memory-bound</h3>
-            <p class="card-lead">More theoretical FLOPS do not help much if the compute units are waiting for data.</p>
-            <div class="card-flow">HBM → DATA MOVEMENT → GPU COMPUTE</div>
-            <div class="card-detail">
-              <h4>Two different ceilings</h4>
-              <p><strong>Compute-bound:</strong> available arithmetic capacity limits the operation. <strong>Memory-bound:</strong> data cannot be supplied to the compute units fast enough.</p>
-              <h4>Why it matters</h4>
-              <p>Peak FLOPS alone is a poor way to compare GPUs for a specific workload. Decode can depend heavily on HBM bandwidth and capacity, cache efficiency and kernel efficiency. The limiting resource can change with concurrency.</p>
-              <p><strong>Watch:</strong> measured compute utilisation and memory-bandwidth utilisation, supported by profiling of the actual workload.</p>
-              <p class="remember">Remember: match the optimisation to the ceiling you are actually hitting.</p>
-            </div>
-            <p class="question">Are we compute-bound or memory-bandwidth-bound at this concurrency, and what profiling evidence supports that?</p>
+          <article class="card source-card" id="card-2">
+            <h3>Card 2. Compute-bound vs Memory-bound ⭐⭐⭐</h3>
+            <h4>One sentence</h4>
+            <p>A workload is <strong>compute-bound when arithmetic capacity limits performance and memory-</strong><strong>bound when supplying data to the compute units limits performance.</strong></p>
+            <h4>Mental picture</h4>
+            <p>A GPU has:</p>
+            <p><strong>Huge compute engine ← data must arrive fast enough ← HBM</strong></p>
+            <p>If the compute units are waiting for data, adding more theoretical FLOPS doesn&#x27;t necessarily solve the problem.</p>
+            <h4>Why it matters for your work</h4>
+            <p>This explains why comparing GPUs using only peak FLOPS can be misleading.</p>
+            <p>A decode workload may care enormously about:</p>
+            <ul><li>High Bandwidth Memory (HBM) bandwidth</li><li>memory capacity</li><li>cache efficiency</li><li>kernel efficiency</li></ul>
+            <h4>Engineering question</h4>
+            <p>&quot;Are we compute-bound or memory-bandwidth-bound at this concurrency, and what evidence from profiling supports that?&quot;</p>
+            <h4>Remember</h4>
+            <p><strong>More FLOPS don&#x27;t help if the GPU is waiting for data.</strong></p>
           </article>
-          <article class="card" id="card-3">
-            <span class="card-number">03 / PERFORMANCE</span>
-            <h3>TTFT vs TPOT vs Throughput</h3>
-            <p class="card-lead">Latency describes the experience. Throughput describes the capacity.</p>
-            <div class="card-flow">FIRST RESPONSE → GENERATION PACE → TOTAL CAPACITY</div>
-            <div class="card-detail">
-              <h4>Three questions, three metrics</h4>
-              <ul><li><strong>TTFT:</strong> How long until the first token? “How quickly did it respond?”</li><li><strong>TPOT:</strong> How much time per output token? “How fast is it responding?”</li><li><strong>Throughput:</strong> How much work is completed per unit time? “How much traffic can it serve?”</li></ul>
-              <h4>Read the trade-off</h4>
-              <p>For example, <strong>throughput +20% and TTFT +45%</strong> could mean more total traffic served while individual users wait much longer. Report latency distributions as well as throughput; batching or higher concurrency may change both.</p>
-              <p class="remember">Remember: a throughput win is not automatically a customer win.</p>
-            </div>
-            <p class="question">What throughput did we achieve while maintaining the customer’s latency SLO?</p>
+          <article class="card source-card" id="card-3">
+            <h3>Card 3. TTFT vs TPOT vs Throughput ⭐⭐⭐</h3>
+            <p>These should become almost automatic for you.</p>
+            <div class="table-wrap"><table><thead><tr><th scope="col">Metric</th><th scope="col">Plain English</th><th scope="col">Customer perception</th></tr></thead><tbody><tr><td>TTFT</td><td>Time waiting before first token</td><td>&quot;How quickly did it respond?&quot;</td></tr><tr><td>TPOT</td><td>Time between generated tokens</td><td>&quot;How fast is it responding?&quot;</td></tr><tr><td>Throughput</td><td>Total work completed per time</td><td>&quot;How much traffic can it serve?&quot;</td></tr></tbody></table></div>
+            <h4>Important TPM lesson</h4>
+            <p>You cannot call something a performance win from throughput alone.</p>
+            <p>Example:</p>
+            <p><strong>Throughput +20%, TTFT +45%</strong></p>
+            <p>could mean the system serves more total traffic but individual users wait considerably longer.</p>
+            <h4>Engineering question</h4>
+            <p>&quot;What throughput did we achieve while maintaining the customer&#x27;s latency Service-Level Objective?&quot;</p>
+            <h4>Remember</h4>
+            <p><strong>Latency tells me the experience. Throughput tells me the capacity.</strong></p>
           </article>
-          <article class="card" id="card-4">
-            <span class="card-number">04 / KV CACHE &amp; MEMORY</span>
-            <h3>What is the KV Cache?</h3>
-            <p class="card-lead">It is the conversation’s working memory: stored attention state for tokens already processed.</p>
-            <div class="card-flow">PAST TOKENS → STORE KEYS + VALUES → REUSE ON DECODE</div>
-            <div class="card-detail">
-              <h4>Why cache?</h4>
-              <p>Without reuse, prior attention state would need to be recomputed as new tokens are generated. The KV cache keeps the keys and values from prior tokens so decode can reuse them while computing the new token’s state.</p>
-              <h4>Why it becomes a systems problem</h4>
-              <p>Longer context, more concurrent users and persistent coding or agent sessions all increase KV memory demand. The question is no longer just “Do the weights fit?” but “Do the weights <em>and</em> the KV state for all concurrent requests fit?”</p>
-              <p><strong>Watch:</strong> KV bytes, context length, concurrency, available HBM and memory allocated to weights.</p>
-              <p class="remember">Remember: weights are the model’s knowledge; KV is the conversation’s working memory.</p>
-            </div>
-            <p class="question">Will model weights and KV state fit for the expected context lengths and concurrency?</p>
+          <article class="card source-card" id="card-4">
+            <h3>Card 4. What is the KV Cache? ⭐⭐⭐</h3>
+            <h4>One sentence</h4>
+            <p>The <strong>Key-Value cache stores intermediate attention state from tokens already processed so </strong> <strong>the model doesn&#x27;t repeatedly recompute them while generating each new token.</strong></p>
+            <p>Without caching:</p>
+            <pre class="source-diagram">1     Token 1 → compute previous context
+2     Token 2 → compute previous context again
+3     Token 3 → compute it again
+4     ...</pre>
+            <p>With KV cache:</p>
+            <pre class="source-diagram">1     Previous computation → stored
+2                            ↓
+3     New token → reuse previous KV → compute only what&#x27;s new</pre>
+            <h4>Why this is becoming critical</h4>
+            <p>As:</p>
+            <ul><li>context grows,</li><li>concurrency grows,</li><li>models support longer conversations,</li><li>coding/agent sessions become persistent,</li></ul>
+            <p>KV memory becomes enormous.</p>
+            <p>Eventually the problem is no longer simply:</p>
+            <p>&quot;Will the model weights fit?&quot;</p>
+            <p>but:</p>
+            <p><strong>&quot;Will the model + KV state for all concurrent users fit?&quot;</strong></p>
+            <h4>Remember</h4>
+            <p><strong>Weights are the model&#x27;s knowledge. KV cache is the conversation&#x27;s working memory.</strong></p>
           </article>
-          <article class="card" id="card-5">
-            <span class="card-number">05 / KV CACHE &amp; MEMORY</span>
-            <h3>PagedAttention</h3>
-            <p class="card-lead">Manage KV in blocks rather than requiring one large contiguous allocation.</p>
-            <div class="card-flow">LOGICAL SEQUENCE → BLOCK MAP → PHYSICAL KV BLOCKS</div>
-            <div class="card-detail">
-              <h4>The problem</h4>
-              <p>Requests arrive and leave with different lengths. Reserving large contiguous memory regions can waste space and cause fragmentation.</p>
-              <h4>The mechanism</h4>
-              <p>PagedAttention divides KV state into fixed-size blocks and maps logical sequence blocks to physical locations, conceptually similar to virtual memory. It is an important concept associated with vLLM.</p>
-              <p><strong>Benefit:</strong> better memory utilisation can support more concurrent sequences. <strong>Trade-off:</strong> block mapping has overhead and the final block may not be full.</p>
-              <p class="remember">Remember: distinguish actual KV capacity from allocation waste.</p>
-            </div>
-            <p class="question">Is our limitation actual KV capacity or inefficient allocation and fragmentation?</p>
+          <article class="card source-card" id="card-5">
+            <h3>Card 5. PagedAttention ⭐⭐⭐</h3>
+            <h4>Problem</h4>
+            <p>KV memory can become fragmented as many requests of different lengths arrive and leave.</p>
+            <h4>Mechanism</h4>
+            <p><strong>PagedAttention</strong> breaks KV cache into smaller fixed-size blocks/pages rather than requiring large contiguous areas of GPU memory.</p>
+            <p>Conceptually this resembles virtual memory.</p>
+            <pre class="source-diagram">1     Logical request
+2     1 2 3 4 5
+3
+4           ↓ mapping
+5
+6     KV blocks in different
+7     physical memory locations</pre>
+            <h4>Benefit</h4>
+            <p>Better memory utilisation and support for more concurrent sequences.</p>
+            <p>This is one of the important concepts associated with <strong>vLLM</strong>.</p>
+            <h4>Engineering question</h4>
+            <p>&quot;Is our limitation actual KV capacity or inefficient KV allocation/fragmentation?&quot;</p>
+            <h4>Remember</h4>
+            <p><strong>PagedAttention manages KV memory in blocks rather than demanding one contiguous </strong> <strong>allocation.</strong></p>
           </article>
-          <article class="card" id="card-6">
-            <span class="card-number">06 / KV CACHE &amp; MEMORY</span>
-            <h3>Prefix Caching</h3>
-            <p class="card-lead">If a prompt starts with content already processed, reuse its KV state rather than repeat prefill.</p>
-            <div class="card-flow">MATCHING PREFIX → CACHED KV → SKIP REPEATED PREFILL</div>
-            <div class="card-detail">
-              <h4>Where reuse comes from</h4>
-              <p>System prompts, shared documents and coding repositories, repeated agent instructions and conversation history can create matching prefixes. A cache stores the KV produced for a prefix so a later matching request can reuse it.</p>
-              <h4>Why it matters</h4>
-              <p>Useful reuse can reduce prefill work and TTFT, and improve effective throughput and cost per token. But the cache occupies memory, and an architecture with little real prefix reuse may deliver little benefit.</p>
-              <p><strong>Watch:</strong> prefix-cache hit rate on representative production traffic, prefill saved, TTFT and cache occupancy.</p>
-            </div>
-            <p class="question">What is our prefix-cache hit rate on representative production traffic?</p>
+          <article class="card source-card" id="card-6">
+            <h3>Card 6. Prefix Caching ⭐⭐⭐</h3>
+            <h4>Problem</h4>
+            <p>Users frequently send prompts containing identical content.</p>
+            <p>Examples:</p>
+            <ul><li>system prompts</li><li>common documents</li><li>shared coding repositories</li><li>repeated agent instructions</li><li>multi-turn conversation history</li></ul>
+            <p>Why recompute the same prefix repeatedly?</p>
+            <h4>Mechanism</h4>
+            <p>Store the KV cache produced for the shared prefix and reuse it.</p>
+            <pre class="source-diagram">1     Repeated prefix
+2           ↓
+3     Cached KV exists?
+4        ↓ YES
+5     Reuse KV
+6        ↓
+7     Skip prefill computation</pre>
+            <h4>Benefit</h4>
+            <p>Potential improvements to:</p>
+            <ul><li>TTFT</li><li>GPU utilisation</li><li>throughput</li><li>cost/token</li></ul>
+            <h4>Critical variable</h4>
+            <p><strong>Cache hit rate.</strong></p>
+            <p>A wonderful caching architecture with almost no reusable prefixes may provide little benefit.</p>
+            <h4>Engineering question</h4>
+            <p><strong>&quot;What&#x27;s our prefix-cache hit rate on representative production traffic?&quot;</strong></p>
           </article>
-          <article class="card" id="card-7">
-            <span class="card-number">07 / KV CACHE &amp; MEMORY</span>
-            <h3>KV Cache Hit Rate</h3>
-            <p class="card-lead">A useful hit avoids work—but only if the saved computation outweighs retrieval.</p>
-            <div class="card-flow">MORE USEFUL HITS → LESS PREFILL → POTENTIALLY LOWER LATENCY</div>
-            <div class="card-detail">
-              <h4>Make the denominator explicit</h4>
-              <p>If 86 of 100 comparable requests for reusable KV find it, the request-level hit rate is <strong>86%</strong>. Other systems may report hits by token or block; those rates are not interchangeable.</p>
-              <h4>Read reported results carefully</h4>
-              <p>The source describes one workload-specific result moving from <strong>75.2% to 86.8%</strong> cache hit rate, alongside claims of approximately <strong>2× goodput</strong> and lower p95 TTFT. This is an example, not a universal result or proof of causation.</p>
-              <p><strong>Watch:</strong> useful hits, saved prefill, retrieval latency, KV size and the workload. A hit from a slow tier can still lose to recomputation.</p>
-            </div>
-            <p class="question">Did performance improve because transfers became faster, hit rate increased, or KV became smaller?</p>
+          <article class="card source-card" id="card-7">
+            <h3>Card 7. KV Cache Hit Rate ⭐⭐⭐</h3>
+            <p>This is one I particularly want you to remember.</p>
+            <h4>Definition</h4>
+            <p>Percentage of requested KV state found in cache rather than requiring recomputation.</p>
+            <pre class="source-diagram">1     100 requests for reusable KV
+2
+3     86 found
+4     14 missing
+5
+6     Hit rate = 86%</pre>
+            <h4>Why it matters</h4>
+            <p>Higher useful hit rate can mean:</p>
+            <p><strong>fewer prefill computations → less GPU work → lower latency → higher effective </strong> <strong>throughput</strong></p>
+            <p>One screenshot describes a workload-specific result moving from <strong>75.2% → 86.8% cache hit </strong> <strong>rate</strong>, alongside claims of approximately <strong>2× goodput</strong> and lower p95 TTFT.</p>
+            <p>Do <strong>not</strong> memorise those performance numbers as universal.</p>
+            <p>Memorise the relationship.</p>
+            <h4>Engineering question</h4>
+            <p>&quot;Did performance improve because KV transfers became faster, because hit rate increased, or because KV became smaller?&quot;</p>
           </article>
-          <article class="card" id="card-8">
-            <span class="card-number">08 / KV CACHE &amp; MEMORY</span>
-            <h3>Hierarchical KV Cache / LMCache</h3>
-            <p class="card-lead">Keep valuable KV beyond limited GPU memory—but make sure it is worth retrieving.</p>
-            <div class="card-flow">HBM → HOST DRAM → NVMe<br><span>faster / smaller → slower / larger</span></div>
-            <div class="card-detail">
-              <h4>The mechanism</h4>
-              <p>GPU HBM is fast and scarce. Systems such as LMCache can retain and restore useful KV across a hierarchy that may include host DRAM and storage, rather than keeping every block in HBM.</p>
-              <h4>The break-even</h4>
-              <p>A hit alone is not enough: retrieving state must cost less than recomputing the corresponding prefill, accounting for latency and bandwidth. The answer can differ by tier, prefix length and load.</p>
-              <p><strong>Watch:</strong> hit rate by tier, retrieval latency, available bandwidth and recomputation cost.</p>
-            </div>
-            <p class="question">For each tier, when is retrieving KV cheaper than recomputing prefill?</p>
+          <article class="card source-card" id="card-8">
+            <h3>Card 8. Hierarchical KV Cache / LMCache ⭐⭐⭐</h3>
+            <h4>Problem</h4>
+            <p>GPU High Bandwidth Memory is extremely valuable and limited.</p>
+            <p>Keeping every KV block there doesn&#x27;t scale.</p>
+            <h4>Solution</h4>
+            <p>Create a memory hierarchy:</p>
+            <pre class="source-diagram">1     FAST / EXPENSIVE
+2            HBM
+3             ↓
+4         CPU DRAM
+5             ↓
+6           NVMe
+7     SLOWER / LARGER</pre>
+            <p>Systems such as <strong>LMCache</strong> manage KV state beyond GPU HBM so useful state can be retained and restored later.</p>
+            <h4>Critical trade-off</h4>
+            <p>Retrieving cached KV must be cheaper than recomputing it.</p>
+            <p>Therefore:</p>
+            <p><strong>cache hit alone isn&#x27;t sufficient</strong></p>
+            <p>You care about:</p>
+            <p><strong>hit rate + retrieval latency + bandwidth + recomputation cost</strong></p>
+            <h4>Engineering question</h4>
+            <p>&quot;For each storage tier, what&#x27;s the break-even point between retrieving KV and recomputing prefill?&quot;</p>
           </article>
-          <article class="card" id="card-9">
-            <span class="card-number">09 / PRECISION</span>
-            <h3>KV Quantisation</h3>
-            <p class="card-lead">Use fewer bits for conversation state to reduce memory and data movement.</p>
-            <div class="card-flow">BF16 KV → LOWER-PRECISION KV → SMALLER FOOTPRINT</div>
-            <div class="card-detail">
-              <h4>What changes</h4>
-              <p>KV values may be stored in lower-precision formats such as FP8, INT8 or INT4-style representations. Smaller state can support more concurrent users, longer context, greater cache residency and less transfer.</p>
-              <h4>What it costs</h4>
-              <p>Quality may change, and conversion, specialised kernels and compatibility can introduce overhead. The source describes an example combining 4-bit TurboQuant KV with LMCache while keeping sensitive layers in BF16; treat it as an implementation example, not a general performance guarantee.</p>
-              <p><strong>Watch:</strong> memory saved, quality, conversion overhead, transfer size and end-to-end latency.</p>
-              <p class="remember">Remember: smaller conversation memory does not necessarily mean faster computation.</p>
-            </div>
-            <p class="question">What memory reduction do we get, and what quality or conversion overhead do we pay?</p>
+          <article class="card source-card" id="card-9">
+            <h3>Card 9. KV Quantisation ⭐⭐⭐</h3>
+            <h4>Problem</h4>
+            <p>KV cache consumes enormous amounts of memory.</p>
+            <h4>Mechanism</h4>
+            <p>Represent KV values using fewer bits.</p>
+            <p>Conceptually:</p>
+            <pre class="source-diagram">1     BF16 KV
+2        ↓
+3     FP8 / INT8 / INT4-style representation
+4        ↓
+5     smaller KV</pre>
+            <h4>Benefit</h4>
+            <p>Smaller KV can mean:</p>
+            <ul><li>more concurrent users</li><li>longer context</li><li>higher cache residency</li><li>less data transferred</li><li>potentially higher hit rates</li></ul>
+            <h4>But…</h4>
+            <p>Quantisation may introduce:</p>
+            <ul><li>accuracy impacts</li><li>conversion overhead</li><li>kernel complexity</li><li>compatibility issues</li></ul>
+            <p>One supplied post describes combining a <strong>4-bit TurboQuant KV cache with LMCache</strong>, with sensitive layers remaining in BF16.</p>
+            <h4>Engineering question</h4>
+            <p>&quot;What memory reduction do we get, and what quality or conversion overhead do we pay?&quot;</p>
+            <h4>Remember</h4>
+            <p><strong>KV quantisation makes conversation memory smaller, not necessarily computation </strong> <strong>faster.</strong></p>
           </article>
-          <article class="card" id="card-10">
-            <span class="card-number">10 / KV CACHE &amp; MEMORY</span>
-            <h3>Cache Eviction</h3>
-            <p class="card-lead">When a cache fills, deciding what leaves determines which future requests pay the price.</p>
-            <div class="card-flow">HOT → KEEP &nbsp; / &nbsp; WARM → TIER &nbsp; / &nbsp; COLD → EVICT</div>
-            <div class="card-detail">
-              <h4>Why the policy matters</h4>
-              <p>Evicting state that is needed again soon leads to a miss, re-prefill, additional GPU work and potentially higher latency. Moving state to a lower tier can preserve it, but a later restore has its own cost.</p>
-              <h4>Decisions and evidence</h4>
-              <p>Policies may consider recency, frequency, size, retrieval cost or expected reuse. These objectives compete: preserving one block means another cannot occupy that capacity.</p>
-              <p><strong>Watch:</strong> future misses, reuse distance, tier restore latency, prefill recomputation and user latency.</p>
-            </div>
-            <p class="question">What does the eviction policy optimise for: recency, frequency, size, retrieval cost or expected reuse?</p>
+          <article class="card source-card" id="card-10">
+            <h3>Card 10. Cache Eviction</h3>
+            <h4>Problem</h4>
+            <p>Eventually the cache is full.</p>
+            <p>Something has to leave.</p>
+            <h4>Mechanism</h4>
+            <p>An eviction policy chooses what to discard.</p>
+            <p>Conceptually:</p>
+            <pre class="source-diagram">1     HOT KV → keep
+2
+3     WARM KV → maybe move
+4
+5     COLD KV → DRAM/NVMe or evict</pre>
+            <h4>The TPM insight</h4>
+            <p>An eviction decision affects future latency.</p>
+            <p>Evict something that gets reused soon:</p>
+            <p>→ cache miss → re-prefill</p>
+            <p>→ GPU compute → latency increase.</p>
+            <h4>Engineering question</h4>
+            <p>&quot;What does the eviction policy optimise for: recency, frequency, size, retrieval cost or expected reuse?&quot;</p>
           </article>
-          <article class="card" id="card-11">
-            <span class="card-number">11 / DISAGGREGATED INFERENCE</span>
-            <h3>Prefill–Decode Disaggregation</h3>
-            <p class="card-lead">Run prefill and decode on separate workers so each can scale and specialise independently.</p>
-            <div class="card-flow">REQUEST → PREFILL GPUS → KV TRANSFER → DECODE GPUS</div>
-            <div class="card-detail">
-              <h4>The opportunity</h4>
-              <p>Prefill and decode have different resource profiles. Separate pools can be sized independently and potentially improve utilisation by specialising each phase.</p>
-              <h4>The new bottleneck</h4>
-              <p>KV must now move between workers. Transfer, scheduling and coordination can erase the utilisation gains if they add too much time or cost on the critical path.</p>
-              <p><strong>Watch:</strong> utilisation, KV-transfer time, scheduling overhead, TTFT, TPOT and goodput under the same SLO as a colocated baseline.</p>
-              <p class="remember">Remember: disaggregation creates a data-movement problem as it solves a resource-allocation problem.</p>
-            </div>
-            <p class="question">Where is the break-even point where improved utilisation exceeds KV-transfer and scheduling overhead?</p>
+          <article class="card source-card" id="card-11">
+            <h3>Card 11. Prefill-Decode Disaggregation ⭐⭐⭐</h3>
+            <h4>Problem</h4>
+            <p>Prefill and decode have different hardware characteristics.</p>
+            <p>So why force both onto exactly the same resources?</p>
+            <h4>Mechanism</h4>
+            <pre class="source-diagram">1     Request
+2        ↓
+3     PREFILL GPUs
+4        ↓
+5     KV cache transfer
+6        ↓
+7     DECODE GPUs
+8        ↓
+9     Generated tokens</pre>
+            <p>You can then scale the two independently.</p>
+            <h4>Potential benefit</h4>
+            <p>Higher utilisation through workload specialisation.</p>
+            <h4>New problem</h4>
+            <p>The KV cache now has to <strong>move</strong>.</p>
+            <p>If KV movement takes too long:</p>
+            <p>the network can erase the benefit of disaggregation.</p>
+            <h4>Engineering question</h4>
+            <p>This is the one I want you to retain:</p>
+            <p><strong>&quot;Where is the break-even point where improved GPU utilisation exceeds KV-transfer </strong> <strong>and scheduling overhead?&quot;</strong></p>
+            <p>That&#x27;s a very good TPM Director question.</p>
           </article>
-          <article class="card" id="card-12">
-            <span class="card-number">12 / DATA MOVEMENT</span>
-            <h3>Incremental KV Transfer</h3>
-            <p class="card-lead">Hide communication under computation instead of waiting for all prefill to finish.</p>
-            <div class="card-flow">COMPUTE LAYER 1 → TRANSFER &nbsp; ∥ &nbsp; COMPUTE LAYER 2</div>
-            <div class="card-detail">
-              <h4>Two approaches</h4>
-              <p><strong>Naive:</strong> complete all prefill, transfer all KV, then start decode. <strong>Incremental:</strong> transfer available layer KV while subsequent layers are still computing, where the serving implementation supports it.</p>
-              <h4>Think in critical-path time</h4>
-              <p>Raw transfer duration can be substantial while the user sees only the portion not hidden by useful computation. Overlap is not free: coordination and resource contention can reduce its benefit.</p>
-              <p><strong>Watch:</strong> raw transfer time, overlap achieved, exposed communication time and end-to-end latency.</p>
-              <p class="remember">Remember: performance depends on how much expense sits on the critical path.</p>
-            </div>
-            <p class="question">How much transfer time is exposed after communication and computation overlap?</p>
+          <article class="card source-card" id="card-12">
+            <h3>Card 12. Incremental KV Transfer</h3>
+            <p>One of your screenshots contains an excellent conceptual point.</p>
+            <h4>Naive implementation</h4>
+            <pre class="source-diagram">1     Finish entire prefill
+2            ↓
+3     Transfer entire KV
+4            ↓
+5     Start decode</pre>
+            <p>Decode waits for everything.</p>
+            <h4>Better implementation</h4>
+            <pre class="source-diagram">1     Compute layer 1 KV → transfer
+2     Compute layer 2 KV → transfer
+3     Compute layer 3 KV → transfer
+4     ...
+5                         ↓
+6             transfer overlaps compute</pre>
+            <p>Data movement occurs while later computation continues.</p>
+            <h4>Principle</h4>
+            <p><strong>Hide communication underneath computation.</strong></p>
+            <p>This is an extremely useful performance concept beyond KV cache.</p>
+            <h4>Engineering question</h4>
+            <p>&quot;Are we measuring raw KV-transfer time, or the transfer time actually exposed after communication/computation overlap?&quot;</p>
+            <h4>Remember</h4>
+            <p><strong>Performance isn&#x27;t just how expensive something is. It&#x27;s how much of the expense sits on </strong> <strong>the critical path.</strong></p>
           </article>
-          <article class="card" id="card-13">
-            <span class="card-number">13 / GPU NETWORKING</span>
-            <h3>RDMA &amp; GPU-direct Data Movement</h3>
-            <p class="card-lead">Reduce CPU involvement and avoid unnecessary host-memory staging when moving data between machines.</p>
-            <div class="card-flow">GPU MEMORY → NIC → NETWORK → NIC → GPU MEMORY</div>
-            <div class="card-detail">
-              <h4>What the path changes</h4>
-              <p>Remote Direct Memory Access (RDMA) enables data transfer with reduced CPU involvement. Supported GPU-direct paths can let a network interface access GPU memory rather than staging data through host memory. Actual capabilities depend on hardware, drivers and topology.</p>
-              <h4>Why it matters</h4>
-              <p>At scale, extra copies and host orchestration can consume CPU resources and increase transfer latency. Some designs further reduce CPU control using GPU-driven or proxy-free approaches.</p>
-              <p><strong>Watch:</strong> GB/s, line-rate utilisation, transfer latency, CPU utilisation and exposed communication time.</p>
-            </div>
-            <p class="question">Is KV movement GPU-to-GPU directly, or are we staging through host memory?</p>
+          <article class="card source-card" id="card-13">
+            <h3>Card 13. RDMA / GPU-direct data movement ⭐⭐⭐</h3>
+            <h4>RDMA</h4>
+            <p><strong>Remote Direct Memory Access</strong></p>
+            <p>The basic goal is to move data between machines without forcing the CPU to copy and orchestrate every byte.</p>
+            <p>Conceptually:</p>
+            <pre class="source-diagram">1     Slower / CPU-centric
+2
+3     GPU → CPU memory → CPU → NIC
+4                          ↓
+5                        Network
+6
+7
+8     Direct path
+9
+10     GPU memory → NIC → Network → NIC → GPU memory</pre>
+            <p>The screenshots describe GPU-controlled/proxy-free approaches where CPU involvement is reduced or removed.</p>
+            <h4>Why you care</h4>
+            <p>At very large scale, unnecessary memory copies can become a serious latency and CPU-overhead problem.</p>
+            <h4>Metrics</h4>
+            <ul><li>GB/s</li><li>line-rate utilisation</li><li>transfer latency</li><li>CPU utilisation</li><li>exposed communication time</li></ul>
+            <h4>Engineering question</h4>
+            <p>&quot;Is KV movement GPU-to-GPU directly, or are we staging through host memory?&quot;</p>
           </article>
-          <article class="card" id="card-14">
-            <span class="card-number">14 / DISAGGREGATED INFERENCE</span>
-            <h3>Heterogeneous Prefill &amp; Decode</h3>
-            <p class="card-lead">Different accelerators may suit different phases, but their KV representations must interoperate.</p>
-            <div class="card-flow">PREFILL ON ACCELERATOR A → CONVERT / TRANSFER → DECODE ON B</div>
-            <div class="card-detail">
-              <h4>Why it is harder</h4>
-              <p>Accelerators can differ in KV layout, numerical formats, memory organisation and networking capabilities. Specialising each phase may help, but conversion or reformatting can be needed before the receiving worker can use the state.</p>
-              <p><strong>Watch:</strong> transfer and conversion cost, interoperability, phase utilisation and end-to-end latency at the target workload.</p>
-              <p class="remember">Remember: disaggregation gets harder when compute becomes heterogeneous.</p>
-            </div>
-            <p class="question">Is the KV representation interoperable, or does the transfer path require conversion?</p>
+          <article class="card source-card" id="card-14">
+            <h3>Card 14. Heterogeneous Prefill/Decode</h3>
+            <p>Your screenshots raise a more advanced version of PD disaggregation.</p>
+            <p>Instead of:</p>
+            <p><strong>AMD GPU → AMD GPU</strong></p>
+            <p>you might conceptually have:</p>
+            <p><strong>Accelerator A → Accelerator B</strong></p>
+            <p>with each specialised for a different phase.</p>
+            <h4>Problem</h4>
+            <p>Different accelerator architectures may have:</p>
+            <ul><li>different KV layouts</li><li>numerical formats</li><li>memory organisation</li><li>networking capabilities</li></ul>
+            <p>Therefore transferring KV becomes considerably more complicated.</p>
+            <h4>The TPM question</h4>
+            <p>&quot;Is the KV representation interoperable between the two accelerators, or do we need conversion/reformatting on the transfer path?&quot;</p>
+            <h4>Remember</h4>
+            <p><strong>Disaggregation gets harder when compute becomes heterogeneous.</strong></p>
           </article>
-          <article class="card" id="card-15">
-            <span class="card-number">15 / SERVING ENGINES</span>
-            <h3>vLLM, SGLang, TensorRT-LLM &amp; llama.cpp</h3>
-            <p class="card-lead">There is no meaningful universal answer to “Which engine is fastest?”</p>
-            <div class="card-flow">MODEL + HARDWARE + WORKLOAD + SLO + VERSION</div>
-            <div class="card-detail">
-              <h4>A useful starting mental model</h4>
-              <ul><li><strong>vLLM:</strong> general-purpose high-throughput serving, PagedAttention and continuous batching.</li><li><strong>SGLang:</strong> high-performance serving, scheduling and RadixAttention-style prefix reuse, including structured and agentic workloads.</li><li><strong>TensorRT-LLM:</strong> an NVIDIA-focused optimised inference stack.</li><li><strong>llama.cpp:</strong> lightweight, portable local inference, including CPU and edge scenarios.</li></ul>
-              <p>These are starting points, not permanent rankings. Compare model, accelerator, precision, input/output lengths, concurrency, latency target and software version, as well as deployment and feature requirements.</p>
-            </div>
-            <p class="question">Why was this engine chosen for this exact model and customer workload?</p>
+          <article class="card source-card" id="card-15">
+            <h3>Card 15. vLLM vs SGLang vs TensorRT-LLM vs llama.cpp</h3>
+            <p>Don&#x27;t memorise the simplistic &quot;which one is fastest?&quot; graphics.</p>
+            <p>Use this mental model:</p>
+            <h4>vLLM</h4>
+            <p>Think:</p>
+            <p><strong>general-purpose high-throughput model serving + PagedAttention + continuous batching</strong></p>
+            <h4>SGLang</h4>
+            <p>Think:</p>
+            <p><strong>high-performance serving with strong scheduling, structured/agentic workload </strong> <strong>capabilities and RadixAttention-style prefix reuse</strong></p>
+            <h4>TensorRT-LLM</h4>
+            <p>Think:</p>
+            <p><strong>NVIDIA-focused heavily optimised inference stack</strong></p>
+            <h4>llama.cpp</h4>
+            <p>Think:</p>
+            <p><strong>lightweight/portable inference, particularly CPU and edge/local scenarios</strong></p>
+            <h4>TPM lesson</h4>
+            <p>There is no meaningful statement:</p>
+            <p>&quot;Framework X is fastest.&quot;</p>
+            <p>without:</p>
+            <p><strong>model + accelerator + precision + sequence length + concurrency + latency target + </strong> <strong>software version</strong></p>
+            <h4>Engineering question</h4>
+            <p>&quot;Why was this engine chosen for this exact model and customer workload?&quot;</p>
           </article>
-          <article class="card" id="card-16">
-            <span class="card-number">16 / SERVING ENGINES</span>
-            <h3>Grammar-Constrained Generation</h3>
-            <p class="card-lead">Prompting for JSON does not guarantee a valid structure; decoding constraints can enforce a grammar.</p>
-            <div class="card-flow">MODEL SCORES → ALLOW LEGAL TOKENS → STRUCTURED OUTPUT</div>
-            <div class="card-detail">
-              <h4>How it works</h4>
-              <p>Grammar-constrained decoding restricts which next tokens may be selected so output follows a supported grammar or schema. This can make JSON, tool calls and agent interfaces more reliable than an instruction alone.</p>
-              <h4>The trade-off</h4>
-              <p>Constraint processing can affect serving performance. An alternative is to validate after generation and retry on failure; either way, syntactically valid output does not guarantee the content is correct.</p>
-              <p><strong>Watch:</strong> validity, retry rates, latency and semantic quality.</p>
-            </div>
-            <p class="question">Is structured output enforced during decoding or validated and retried afterwards?</p>
+          <article class="card source-card" id="card-16">
+            <h3>Card 16. Structured / Grammar-Constrained Generation</h3>
+            <h4>Problem</h4>
+            <p>Applications often need guaranteed structured output:</p>
+            <pre class="source-diagram">1     {
+2       &quot;customer&quot;: &quot;...&quot;,
+3       &quot;priority&quot;: &quot;...&quot;,
+4       &quot;status&quot;: &quot;...&quot;
+5     }</pre>
+            <p>Telling a model:</p>
+            <p>&quot;Please output valid JSON&quot;</p>
+            <p>doesn&#x27;t guarantee valid JSON.</p>
+            <h4>Mechanism</h4>
+            <p>Grammar-constrained decoding restricts which next tokens are legally selectable.</p>
+            <h4>Benefit</h4>
+            <p>More reliable:</p>
+            <ul><li>JSON</li><li>schema</li><li>tool calls</li><li>agent interfaces</li></ul>
+            <h4>Trade-off</h4>
+            <p>Constraint processing itself can affect serving performance.</p>
+            <h4>Engineering question</h4>
+            <p>&quot;Is structured output enforced during decoding or validated/retried afterwards?&quot;</p>
           </article>
-          <article class="card" id="card-17">
-            <span class="card-number">17 / KERNELS &amp; OPTIMISATION</span>
-            <h3>Triton &amp; Custom Kernels</h3>
-            <p class="card-lead">A specialised GPU kernel can reduce memory movement and launch overhead.</p>
-            <div class="card-flow">READ → OPERATION A + B → WRITE</div>
-            <div class="card-detail">
-              <h4>What is a kernel?</h4>
-              <p>It is GPU code for an operation such as attention, a matrix operation or normalisation. Triton offers a higher-level way to write GPU kernels than working entirely at the lowest GPU programming level.</p>
-              <h4>Why fusion helps</h4>
-              <p>Separate operations can write an intermediate result and read it back. A fused kernel combines operations, potentially reducing intermediate memory traffic and kernel launches while improving utilisation.</p>
-              <p><strong>Watch:</strong> compute utilisation, memory traffic, kernel launches and end-to-end performance. Custom kernels add complexity and can be hardware-specific.</p>
-            </div>
-            <p class="question">Is the uplift from compute utilisation, reduced memory traffic or fewer launches?</p>
+          <article class="card source-card" id="card-17">
+            <h3>Card 17. Triton and Custom Kernels</h3>
+            <h4>One sentence</h4>
+            <p>A kernel is specialised GPU code implementing operations such as attention, matrix operations or normalisation.</p>
+            <p>Framework operation:</p>
+            <pre class="source-diagram">1     PyTorch
+2        ↓
+3     generic operations</pre>
+            <p>Optimised path:</p>
+            <pre class="source-diagram">1     Fused/custom kernel
+2            ↓
+3     less memory traffic
+4     fewer launches
+5     better hardware utilisation</pre>
+            <p><strong>Triton</strong> provides a higher-level way of writing GPU kernels than working entirely at the lowest GPU programming level.</p>
+            <h4>Important concept: fusion</h4>
+            <p>Instead of:</p>
+            <pre class="source-diagram">1     Read memory → operation A
+2     write memory
+3     read memory → operation B
+4     write memory</pre>
+            <p>combine operations:</p>
+            <pre class="source-diagram">1     read → A + B → write</pre>
+            <p>Memory movement decreases.</p>
+            <h4>Engineering question</h4>
+            <p>&quot;Is the uplift coming from higher compute utilisation, reduced memory traffic or fewer kernel launches?&quot;</p>
           </article>
-          <article class="card" id="card-18">
-            <span class="card-number">18 / KERNELS &amp; OPTIMISATION</span>
-            <h3>Roofline Analysis</h3>
-            <p class="card-lead">Relate work per byte to hardware ceilings before deciding what to optimise.</p>
-            <div class="card-flow">ARITHMETIC INTENSITY = OPERATIONS ÷ BYTES MOVED</div>
-            <div class="card-detail">
-              <h4>Read the ceiling</h4>
-              <p>At low arithmetic intensity, performance is often constrained by memory bandwidth. At higher intensity it may approach a compute ceiling. The roofline is a model of attainable performance, not a substitute for profiling the real operation.</p>
-              <h4>Why it matters</h4>
-              <p>If an operation is waiting on memory, optimising arithmetic alone may not help. Reducing bytes moved or increasing useful work per byte can be more relevant.</p>
-              <p><strong>Watch:</strong> measured arithmetic intensity, achieved bandwidth and compute rate against the relevant hardware ceilings.</p>
-              <p class="remember">Remember: roofline helps identify which ceiling is being hit.</p>
-            </div>
-            <p class="question">Which ceiling are we hitting for this operation under this workload?</p>
+          <article class="card source-card" id="card-18">
+            <h3>Card 18. Roofline Analysis ⭐⭐</h3>
+            <p>This concept appeared implicitly in your first screenshot and is worth knowing.</p>
+            <h4>Purpose</h4>
+            <p>Roofline analysis asks:</p>
+            <p><strong>What fundamentally limits this operation: compute capability or memory bandwidth?</strong></p>
+            <p>It relates:</p>
+            <p><strong>arithmetic intensity = computation performed / bytes moved</strong></p>
+            <p>Low arithmetic intensity:</p>
+            <p>→ likely memory-bound.</p>
+            <p>High arithmetic intensity:</p>
+            <p>→ potentially compute-bound.</p>
+            <h4>Why this matters</h4>
+            <p>It prevents blindly optimising compute when the workload is actually waiting for memory.</p>
+            <h4>Remember</h4>
+            <p><strong>Roofline tells me which ceiling I&#x27;m hitting.</strong></p>
           </article>
-          <article class="card" id="card-19">
-            <span class="card-number">19 / KERNELS &amp; OPTIMISATION</span>
-            <h3>Speculative Decoding</h3>
-            <p class="card-lead">A cheaper proposer drafts tokens; the target model verifies them to potentially advance faster.</p>
-            <div class="card-flow">DRAFT A B C D → VERIFY ✓ ✓ ✓ ✗ → ACCEPT A B C</div>
-            <div class="card-detail">
-              <h4>The mechanism</h4>
-              <p>Decode is sequential. A draft mechanism proposes several likely tokens and the target model verifies them. If enough proposals are accepted, several tokens may be advanced for less target-model work than ordinary sequential generation.</p>
-              <h4>Measure the whole system</h4>
-              <p>Enabling the feature does not establish value. Drafting and verification have costs, and benefits depend on acceptance rate, draft depth and workload. Verify the intended quality or distributional equivalence for the implementation.</p>
-              <p><strong>Watch:</strong> acceptance rate, draft depth, TPOT, output throughput, overhead and output quality.</p>
-            </div>
-            <p class="question">What acceptance rate and end-to-end throughput or TPOT uplift are we achieving?</p>
+          <article class="card source-card" id="card-19">
+            <h3>Card 19. Speculative Decoding ⭐⭐⭐</h3>
+            <p>Particularly relevant to the performance updates you regularly review.</p>
+            <h4>Problem</h4>
+            <p>Large-model decoding is expensive because tokens are produced sequentially.</p>
+            <h4>Idea</h4>
+            <p>Have a cheaper mechanism propose several likely tokens.</p>
+            <p>The large model then verifies them.</p>
+            <pre class="source-diagram">1     DRAFT:
+2     A B C D
+3
+4     TARGET MODEL:
+5     ✓ ✓ ✓ X
+6
+7     Accept A B C
+8     reject D
+9     continue</pre>
+            <p>If several proposed tokens are accepted, the system advances multiple tokens for less target-model work.</p>
+            <h4>Metrics that matter</h4>
+            <ul><li>draft depth</li><li>acceptance rate</li><li>TPOT</li><li>output throughput</li><li>additional overhead</li><li>quality equivalence</li></ul>
+            <h4>Critical TPM point</h4>
+            <p>Saying:</p>
+            <p>&quot;Speculative decoding enabled&quot;</p>
+            <p>doesn&#x27;t establish value.</p>
+            <p>Ask:</p>
+            <p><strong>&quot;What acceptance rate are we achieving and what&#x27;s the resulting end-to-end </strong> <strong>throughput/TPOT uplift?&quot;</strong></p>
           </article>
-          <article class="card" id="card-20">
-            <span class="card-number">20 / PERFORMANCE ECONOMICS</span>
-            <h3>Tokens per GPU vs Cost per Token</h3>
-            <p class="card-lead">Productivity tells you how much a GPU does; economics tells you what useful output costs.</p>
-            <div class="card-flow">TOKENS / SECOND / GPU → UTILISATION → COST / TOKEN</div>
-            <div class="card-detail">
-              <h4>Two lenses</h4>
-              <p><strong>Tokens/second/GPU</strong> asks how productive each GPU is. <strong>Cost/token</strong> asks how much infrastructure expense is needed for useful output. A more expensive GPU-hour can still be cheaper per token if it produces proportionally more useful tokens at the same SLO.</p>
-              <h4>Include the real system</h4>
-              <p>Depending on the comparison, total cost may include power, cooling, networking, CPU, storage, utilisation, software and operations. State the cost assumptions and whether input and output tokens are counted separately.</p>
-              <p><strong>Watch:</strong> cost per million useful tokens at the required latency target—not just peak unconstrained throughput.</p>
-            </div>
-            <p class="question">What is cost per million tokens at the customer’s required latency target?</p>
+          <article class="card source-card" id="card-20">
+            <h3>Card 20. Tokens per GPU vs Cost per Token ⭐⭐⭐</h3>
+            <p>Your NVIDIA screenshot makes an important point, although marketing claims should be independently validated.</p>
+            <h4>Infrastructure view</h4>
+            <p><strong>tokens/sec/GPU</strong></p>
+            <p>asks:</p>
+            <p>How productive is each GPU?</p>
+            <h4>Economic view</h4>
+            <p><strong>cost/token</strong></p>
+            <p>asks:</p>
+            <p>How much infrastructure cost is required to generate the useful output?</p>
+            <p>Simplified:</p>
+            <p>But real Total Cost of Ownership (TCO) can additionally include:</p>
+            <ul><li>power</li><li>cooling</li><li>networking</li><li>CPU</li><li>storage</li><li>utilisation</li><li>software</li><li>operations</li></ul>
+            <h4>TPM lesson</h4>
+            <p>A GPU that costs more per hour can still have lower cost/token if it produces proportionally more usable tokens while meeting the same Service-Level Objective.</p>
+            <h4>Engineering/business question</h4>
+            <p>&quot;What&#x27;s cost per million tokens at the customer&#x27;s required latency target, rather than peak unconstrained throughput?&quot;</p>
           </article>
-          <article class="card" id="card-21">
-            <span class="card-number">21 / PRECISION &amp; QUANTISATION</span>
-            <h3>Precision: BF16, FP8 &amp; FP4</h3>
-            <p class="card-lead">Fewer bits can mean smaller or faster computation—but only with suitable support and acceptable quality.</p>
-            <div class="card-flow">BF16 → FP8 → FP4 &nbsp; / &nbsp; LESS PRECISION, POTENTIALLY LESS DATA</div>
-            <div class="card-detail">
-              <h4>Potential benefits and costs</h4>
-              <p>Lower precision can reduce memory capacity and bandwidth needs and potentially increase arithmetic throughput. It can also introduce accuracy loss, quantisation complexity, unsupported operations, fallback paths and conversion overhead.</p>
-              <h4>Look beyond the label</h4>
-              <p>A model advertised as FP4 may still use BF16 or FP8 for some operations. “FP4 is faster” is not enough: establish which components actually use each format, how quality was evaluated and whether the end-to-end workload improved.</p>
-              <p><strong>Watch:</strong> precision by operation, quality, throughput, latency and conversion or fallback overhead.</p>
-            </div>
-            <p class="question">Which parts use FP4 versus BF16/FP8, and what accuracy and end-to-end performance were measured?</p>
+          <article class="card source-card" id="card-21">
+            <h3>Card 21. Precision: BF16, FP8, FP4 ⭐⭐⭐</h3>
+            <h4>Mental model</h4>
+            <p>Lower precision means fewer bits representing numbers.</p>
+            <p>Roughly:</p>
+            <pre class="source-diagram">1     BF16
+2      ↓
+3     FP8
+4      ↓
+5     FP4
+6
+7     smaller / potentially faster</pre>
+            <p>Possible benefits:</p>
+            <ul><li>lower memory consumption</li><li>lower memory bandwidth requirements</li><li>higher computational throughput</li></ul>
+            <p>Possible costs:</p>
+            <ul><li>accuracy degradation</li><li>quantisation complexity</li><li>unsupported operations</li><li>fallback paths</li><li>conversion overhead</li></ul>
+            <h4>Never accept</h4>
+            <p>&quot;FP4 is faster.&quot;</p>
+            <p>Ask:</p>
+            <p>&quot;Which parts of the model are actually FP4, which remain BF16/FP8, and what accuracy and end-to-end performance were measured?&quot;</p>
+            <p>That distinction matters directly to many of the benchmark discussions you encounter.</p>
           </article>
-          <article class="card" id="card-22">
-            <span class="card-number">22 / AGENTIC AI</span>
-            <h3>Why Agents Change Inference</h3>
-            <p class="card-lead">Agent sessions repeatedly call models and tools, often with growing and reusable context.</p>
-            <div class="card-flow">PROMPT → MODEL → TOOL → RESULT → MODEL → …</div>
-            <div class="card-detail">
-              <h4>From one answer to a workflow</h4>
-              <p>A simple chat exchange may end after one answer. An agent can alternate model calls and tools over many steps, accumulate history and spawn subagents. Context lengths and opportunities for shared prefixes therefore change over time.</p>
-              <h4>What the infrastructure must handle</h4>
-              <p>Pressure grows on KV capacity, prefix reuse, cache persistence, scheduling, memory tiering and long-context performance. Evaluate the complete task, including tool waits and repeated model calls, rather than a single isolated request.</p>
-              <p><strong>Watch:</strong> task latency, context growth, useful cache reuse, capacity and cost.</p>
-              <p class="remember">Remember: agentic inference makes KV cache an infrastructure concern.</p>
-            </div>
-            <p class="question">How does our serving design handle the real agent loop and context growth?</p>
+          <article class="card source-card" id="card-22">
+            <h3>Card 22. Why Agents Change Inference ⭐⭐⭐</h3>
+            <p>Traditional chatbot:</p>
+            <pre class="source-diagram">1     question → answer → done</pre>
+            <p>Agentic workload:</p>
+            <pre class="source-diagram">1     prompt
+2      ↓
+3     reason
+4      ↓
+5     tool
+6      ↓
+7     result
+8      ↓
+9     reason
+10      ↓
+11     tool
+12      ↓
+13     result
+14      ↓
+15     ...</pre>
+            <p>Context therefore continues growing.</p>
+            <p>Multiple subagents may also appear.</p>
+            <h4>Consequences</h4>
+            <p>Agentic workloads put increasing pressure on:</p>
+            <ul><li>KV capacity</li><li>prefix reuse</li><li>cache persistence</li><li>scheduling</li><li>memory tiering</li><li>long-context performance</li></ul>
+            <p>This explains why so many of your screenshots converge on KV architecture.</p>
+            <h4>Remember</h4>
+            <p><strong>Agentic inference turns KV cache from an implementation detail into infrastructure.</strong></p>
           </article>
-          <article class="card" id="card-23">
-            <span class="card-number">23 / AGENTIC AI</span>
-            <h3>Shared / Global KV Pools</h3>
-            <p class="card-lead">Share previously computed state across workers instead of restricting reuse to one server.</p>
-            <div class="card-flow">SERVER A ↔ SHARED KV POOL ↔ SERVER B</div>
-            <div class="card-detail">
-              <h4>The opportunity</h4>
-              <p>With only local caches, server B may recompute a prefix already processed by server A. A shared pool can make that state available to multiple workers and increase useful reuse. The source references LMCache, ATOM/ATOMesh, Mooncake and AMD Infinity Context as related ideas or projects.</p>
-              <h4>The constraint</h4>
-              <p>Remote reuse is useful only when retrieval costs less than recomputation and transfer latency remains bounded. A larger hit rate alone does not establish an end-to-end win.</p>
-              <p><strong>Watch:</strong> useful hit-rate improvement, retrieval latency, network traffic and avoided prefill.</p>
-            </div>
-            <p class="question">What is the marginal benefit in useful hit rate versus added network and storage latency?</p>
+          <article class="card source-card" id="card-23">
+            <h3>Card 23. Shared / Global KV Pools ⭐⭐⭐</h3>
+            <h4>Traditional model</h4>
+            <p>Each server owns the KV cache created locally.</p>
+            <pre class="source-diagram">1     Server A    Server B
+2     KV A        KV B</pre>
+            <p>Problem: Server B may need something Server A already computed.</p>
+            <h4>Shared approach</h4>
+            <pre class="source-diagram">1             Shared KV pool
+2            ↗      ↑      ↖
+3        Server A Server B Server C</pre>
+            <p>Your screenshots reference ideas/projects around <strong>LMCache, ATOM/ATOMesh, Mooncake </strong> <strong>and AMD Infinity Context</strong> in this area.</p>
+            <h4>Expected opportunity</h4>
+            <p>Greater shareability may increase useful KV-cache hit rates and avoid repeated prefill work.</p>
+            <h4>But</h4>
+            <p>Remote reuse only helps when:</p>
+            <p><strong>retrieval cost &lt; recomputation cost</strong></p>
+            <p>and transfer latency remains bounded.</p>
+            <h4>TPM question</h4>
+            <p><strong>&quot;What&#x27;s the marginal benefit in useful hit rate versus the additional network and </strong> <strong>storage latency?&quot;</strong></p>
           </article>
-          <article class="card" id="card-24">
-            <span class="card-number">24 / HARDWARE &amp; ARCHITECTURE</span>
-            <h3>HBM vs DRAM vs NVMe</h3>
-            <p class="card-lead">A memory hierarchy trades speed and cost against capacity.</p>
-            <div class="card-flow">HBM: HOT → HOST DRAM: WARM → NVMe: COLD</div>
-            <div class="card-detail">
-              <h4>Three tiers</h4>
-              <ul><li><strong>GPU HBM:</strong> fastest, relatively small and expensive; suited to active KV.</li><li><strong>Host DRAM:</strong> slower and larger; a possible tier for warm or offloaded KV.</li><li><strong>NVMe storage:</strong> much slower and potentially much larger; a possible tier for persisted or cold KV.</li></ul>
-              <p>The engineering problem is choosing what belongs where and when to move it. Actual restore time depends on the system, transfer path and load.</p>
-              <p class="remember">Remember: speed ↔ capacity ↔ cost.</p>
-            </div>
-            <p class="question">What is the observed KV restore latency from each tier, and when is recomputation cheaper?</p>
+          <article class="card source-card" id="card-24">
+            <h3>Card 24. HBM vs DRAM vs NVMe ⭐⭐⭐</h3>
+            <p>This should become second nature.</p>
+            <div class="table-wrap"><table><thead><tr><th scope="col">Tier</th><th scope="col">Relative speed</th><th scope="col">Relative capacity</th><th scope="col">Typical KV role</th></tr></thead><tbody><tr><td>HBM</td><td>Fastest</td><td>Smallest/most expensive</td><td>Active/hot KV</td></tr><tr><td>Host DRAM</td><td>Slower</td><td>Larger</td><td>Warm/offloaded KV</td></tr><tr><td>NVMe</td><td>Much slower</td><td>Very large</td><td>Persisted/cold KV</td></tr></tbody></table></div>
+            <p>Think:</p>
+            <p><strong>speed ↔ capacity ↔ cost</strong></p>
+            <p>The engineering challenge is deciding <strong>which KV belongs where and when to move it</strong>.</p>
+            <h4>Engineering question</h4>
+            <p>&quot;What&#x27;s the observed latency to restore KV from each tier, and when is recomputation cheaper?&quot;</p>
           </article>
-          <article class="card" id="card-25">
-            <span class="card-number">25 / HARDWARE &amp; ARCHITECTURE</span>
-            <h3>Whole-System Thinking</h3>
-            <p class="card-lead">Performance is a system result, not a single GPU specification.</p>
-            <div class="card-flow">MODEL → ENGINE → KERNELS → GPU ↔ HBM ↔ CPU / FABRIC</div>
-            <div class="card-detail">
-              <h4>Follow the bottleneck</h4>
-              <p>Whether evaluating MI300/MI350/MI355X-class systems or another platform, include the model, serving engine, kernels, GPU compute, HBM, CPU/DRAM, NIC/fabric and remote GPUs or storage.</p>
-              <p>For example, faster kernels may expose a memory-bandwidth limit; a better cache may then expose the network. The “best” next optimisation changes as the bottleneck moves.</p>
-              <p><strong>Watch:</strong> phase-level profiles and end-to-end latency, throughput and cost before and after each change.</p>
-              <p class="remember">Remember: fixing one bottleneck often reveals the next one.</p>
-            </div>
-            <p class="question">What became the limiting resource after the last optimisation?</p>
+          <article class="card source-card" id="card-25">
+            <h3>Card 25. MI300/MI350/MI355X-class System Thinking</h3>
+            <p>When engineering gives you a hardware result, don&#x27;t think only:</p>
+            <p>GPU.</p>
+            <p>Think:</p>
+            <pre class="source-diagram">1     MODEL
+2      ↓
+3     SERVING ENGINE
+4      ↓
+5     KERNELS
+6      ↓
+7     GPU compute
+8      ↕
+9     HBM
+10      ↕
+11     CPU / DRAM
+12      ↕
+13     NIC / fabric
+14      ↕
+15     remote GPUs / storage</pre>
+            <p>Performance is a <strong>system result</strong>.</p>
+            <p>A bottleneck can therefore migrate.</p>
+            <p>Example:</p>
+            <p>1. optimise kernel 2. GPU compute improves 3. memory bandwidth becomes limiting 4. improve cache 5. networking becomes limiting</p>
+            <h4>Remember</h4>
+            <p><strong>Fixing one bottleneck often reveals the next one.</strong></p>
           </article>
-          <article class="card" id="card-26">
-            <span class="card-number">26 / AI SOFTWARE ENGINEERING</span>
-            <h3>Agent Memory &amp; Session Context</h3>
-            <p class="card-lead">Persistent context can prevent coding agents from repeatedly reconstructing what a team already knows.</p>
-            <div class="card-flow">SESSION → DECISIONS + CONVENTIONS → NEXT SESSION</div>
-            <div class="card-detail">
-              <h4>What to retain</h4>
-              <p>An agent starting a new session may lack the architecture, decisions, previous work, failures and open issues. Project context files or session logs can record work completed, rationale, open threads, errors and conventions.</p>
-              <h4>Measure outcomes, not typing</h4>
-              <p>Assess task completion, regressions, review burden, escaped defects, rollbacks and human intervention—not just lines generated. Context should be relevant, current and safe to retain.</p>
-              <p class="remember">Remember: persistent state prevents repeatedly reconstructing organisational context.</p>
-            </div>
-            <p class="question">Which context is durable and current, and how does it affect completion and review burden?</p>
+          <article class="card source-card" id="card-26">
+            <h3>Card 26. Agent Memory / CLAUDE.md / Session Logs</h3>
+            <p>Your Claude Code screenshots describe a different type of caching problem: <strong>developer-</strong><strong>agent context</strong>.</p>
+            <h4>Problem</h4>
+            <p>An AI coding agent starting a new session can lose knowledge about:</p>
+            <ul><li>architecture</li><li>decisions</li><li>previous work</li><li>failures</li><li>open issues</li></ul>
+            <h4>Pattern</h4>
+            <p>Persistent context files/logs capture things such as:</p>
+            <ul><li>what was done</li><li>decisions and rationale</li><li>open threads</li><li>errors</li><li>conventions</li></ul>
+            <h4>TPM analogy</h4>
+            <p>This is remarkably close to good programme management:</p>
+            <p><strong>persistent state prevents repeatedly reconstructing organisational context.</strong></p>
+            <h4>Application</h4>
+            <p>When evaluating coding-agent productivity, don&#x27;t look only at:</p>
+            <p>lines of code produced.</p>
+            <p>Also look at:</p>
+            <ul><li>task completion</li><li>regression rate</li><li>review burden</li><li>escaped defects</li><li>rollback rate</li><li>human intervention</li></ul>
           </article>
-          <article class="card" id="card-27">
-            <span class="card-number">27 / AI SOFTWARE ENGINEERING</span>
-            <h3>AI-Assisted Code Review</h3>
-            <p class="card-lead">Automate mechanical checks while keeping human review proportional to risk.</p>
-            <div class="card-flow">CHANGE → TESTS + REVIEW → RISK GATE → DEPLOY → OBSERVE</div>
-            <div class="card-detail">
-              <h4>A guarded workflow</h4>
-              <p>An example sequence is AI-assisted change → local tests and lint → automated review → security checks → risk classification → human review where needed → guarded deployment → observation and rollback.</p>
-              <h4>The real objective</h4>
-              <p>More pull requests alone are not success. The aim is greater engineering throughput without a corresponding increase in defects or operational risk. Automated review is a supplement to—not proof of—correctness.</p>
-              <p><strong>Watch:</strong> merged change throughput, escaped defects, review burden, revert and rollback rates, and the risk classes requiring human approval.</p>
-            </div>
-            <p class="question">What happened to throughput and rollback rates, and which risk classes still need human approval?</p>
+          <article class="card source-card" id="card-27">
+            <h3>Card 27. AI-Assisted Code Review</h3>
+            <p>One screenshot describes moving substantial mechanical review work to automated systems while keeping human review risk-based.</p>
+            <h4>Conceptual architecture</h4>
+            <pre class="source-diagram">1     AI writes/change
+2           ↓
+3     local tests + lint
+4           ↓
+5     automated AI review
+6           ↓
+7     security checks
+8           ↓
+9     risk classifier
+10           ↓
+11     human review where necessary
+12           ↓
+13     deploy behind guardrails
+14           ↓
+15     observe / rollback</pre>
+            <h4>TPM significance</h4>
+            <p>The goal should not simply be:</p>
+            <p><strong>more Pull Requests</strong></p>
+            <p>but:</p>
+            <p><strong>higher engineering throughput without a corresponding rise in defects or operational risk.</strong></p>
+            <h4>Questions to ask</h4>
+            <p>&quot;What happened to merged change throughput?&quot;</p>
+            <p>&quot;What happened to revert/rollback rate?&quot;</p>
+            <p>&quot;Which risk classes still require human approval?&quot;</p>
+            <p>That&#x27;s much more meaningful than asking whether engineers are &quot;using AI&quot;.</p>
           </article>
         </div>
         <p id="no-results" class="no-results" hidden>No cards match that search. Try another term.</p>
