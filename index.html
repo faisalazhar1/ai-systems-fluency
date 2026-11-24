@@ -209,8 +209,6 @@
             <h4>Why it matters</h4>
             <p>Higher useful hit rate can mean:</p>
             <p><strong>fewer prefill computations → less GPU work → lower latency → higher effective </strong> <strong>throughput</strong></p>
-            <p>One workload-specific result reports a move from <strong>75.2% → 86.8% cache hit </strong> <strong>rate</strong>, alongside claims of approximately <strong>2× goodput</strong> and lower p95 TTFT.</p>
-            <p>Do <strong>not</strong> memorise those performance numbers as universal.</p>
             <p>Memorise the relationship.</p>
             <h4 class="card-question-heading">Engineering question</h4>
             <p>&quot;Did performance improve because KV transfers became faster, because hit rate increased, or because KV became smaller?&quot;</p>
@@ -257,7 +255,6 @@
             <h4>But…</h4>
             <p>Quantisation may introduce:</p>
             <ul><li>accuracy impacts</li><li>conversion overhead</li><li>kernel complexity</li><li>compatibility issues</li></ul>
-            <p>One supplied post describes combining a <strong>4-bit TurboQuant KV cache with LMCache</strong>, with sensitive layers remaining in BF16.</p>
             <h4 class="card-question-heading">Engineering question</h4>
             <p>&quot;What memory reduction do we get, and what quality or conversion overhead do we pay?&quot;</p>
             <h4 class="card-remember-heading">Remember</h4>
@@ -307,9 +304,7 @@
             <p>If KV movement takes too long:</p>
             <p>the network can erase the benefit of disaggregation.</p>
             <h4 class="card-question-heading">Engineering question</h4>
-            <p>This is the one I want you to retain:</p>
             <p><strong>&quot;Where is the break-even point where improved GPU utilisation exceeds KV-transfer </strong> <strong>and scheduling overhead?&quot;</strong></p>
-            <p>That&#x27;s a very good TPM Director question.</p>
           </article>
           <article class="card source-card" id="card-12">
             <h3>Card 12. Incremental KV Transfer</h3>
