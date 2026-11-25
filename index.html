@@ -44,7 +44,7 @@
         <p class="hero-subtitle">A Technical Field Guide to AI Inference, Infrastructure &amp; Performance</p>
         <p class="hero-copy">Understand the system, identify the bottleneck, and ask the question that moves the conversation forward.</p>
         <div class="hero-actions"><a class="button" href="#inference">Explore the guide <span>↘</span></a><a class="text-link" href="#cards">Go to technical cards →</a></div>
-        <div class="hero-index"><span>11 <small>CHAPTERS</small></span><span>26 <small>TECHNICAL CARDS</small></span><span>01 <small>CONNECTED SYSTEM</small></span></div>
+        <div class="hero-index"><span>11 <small>CHAPTERS</small></span><span>25 <small>TECHNICAL CARDS</small></span><span>01 <small>CONNECTED SYSTEM</small></span></div>
       </header>
 
       <section class="intro section-wrap">
@@ -60,15 +60,15 @@
         <section class="chapter" id="serving"><div class="chapter-num">04</div><div><p class="chapter-tag">FROM MODEL TO SERVICE</p><h3>Serving Engines</h3><p>Serving engines schedule requests, manage memory and execute model operations. vLLM, SGLang, TensorRT-LLM and llama.cpp have different strengths; none is universally fastest. Compare the complete stack against the actual workload and constraints.</p><a href="#card-15">Compare serving engines ↗</a></div></section>
         <section class="chapter" id="disaggregation"><div class="chapter-num">05</div><div><p class="chapter-tag">SEPARATE TO SPECIALISE</p><h3>Disaggregated Inference</h3><p>Separate prefill and decode workers can scale independently and specialise for different bottlenecks. The price is coordination and KV transfer. The critical question is whether utilisation gains exceed the transfer and scheduling overhead on the critical path.</p><a href="#card-11">See the trade-off ↗</a></div></section>
         <section class="chapter" id="networking"><div class="chapter-num">06</div><div><p class="chapter-tag">MOVING STATE</p><h3>GPU Networking &amp; Data Movement</h3><p>Moving KV between workers or memory tiers consumes bandwidth and time. RDMA and GPU-direct paths can reduce host involvement; overlapping transfer with computation can hide some of its cost. Measure exposed communication, not just raw transfer time.</p><a href="#card-13">Explore data movement ↗</a></div></section>
-        <section class="chapter" id="kernels"><div class="chapter-num">07</div><div><p class="chapter-tag">THE EXECUTION LAYER</p><h3>Kernels &amp; Optimisation</h3><p>Custom and fused kernels can reduce memory traffic and launch overhead. Roofline analysis relates arithmetic intensity to compute and bandwidth ceilings; speculative decoding uses cheaper proposals to potentially advance generation faster. Each requires workload-specific measurement.</p><a href="#card-17">Explore optimisation ↗</a></div></section>
-        <section class="chapter" id="precision"><div class="chapter-num">08</div><div><p class="chapter-tag">BITS, SPEED &amp; QUALITY</p><h3>Precision &amp; Quantisation</h3><p>Representing weights, activations or KV state with fewer bits can reduce memory pressure and sometimes improve speed. Benefits depend on hardware support and conversion costs. Measure end-to-end performance and quality, and identify which operations actually use the lower precision.</p><a href="#card-21">Understand precision ↗</a></div></section>
-        <section class="chapter" id="hardware"><div class="chapter-num">09</div><div><p class="chapter-tag">SYSTEMS, NOT SPECS</p><h3>Hardware &amp; System Architecture</h3><p>GPU compute is only one part of the path. HBM, host DRAM, storage, the CPU, NICs and fabric all shape performance. Faster kernels can expose memory or network bottlenecks; peak FLOPS alone cannot predict application performance.</p><a href="#card-24">Explore the hierarchy ↗</a></div></section>
-        <section class="chapter" id="agents"><div class="chapter-num">10</div><div><p class="chapter-tag">LONG-LIVED WORKLOADS</p><h3>Agentic AI Systems</h3><p>Agent workflows loop through model calls and tools, often growing and reusing context across turns or subagents. They put pressure on scheduling, cache persistence and long-context capacity. Shared KV can help only when useful reuse outweighs retrieval and coordination costs.</p><a href="#card-22">Explore agentic workloads ↗</a></div></section>
-        <section class="chapter" id="engineering"><div class="chapter-num">11</div><div><p class="chapter-tag">AI IN THE DEVELOPMENT LOOP</p><h3>AI Software Engineering</h3><p>Automated review can assist human reviewers. Judge the system by completed work, defects, review burden and recovery, not just generated lines or pull request count.</p><a href="#card-26">Explore AI-assisted code review ↗</a></div></section>
+        <section class="chapter" id="kernels"><div class="chapter-num">07</div><div><p class="chapter-tag">THE EXECUTION LAYER</p><h3>Kernels &amp; Optimisation</h3><p>Custom and fused kernels can reduce memory traffic and launch overhead. Roofline analysis relates arithmetic intensity to compute and bandwidth ceilings; speculative decoding uses cheaper proposals to potentially advance generation faster. Each requires workload-specific measurement.</p><a href="#card-16">Explore optimisation ↗</a></div></section>
+        <section class="chapter" id="precision"><div class="chapter-num">08</div><div><p class="chapter-tag">BITS, SPEED &amp; QUALITY</p><h3>Precision &amp; Quantisation</h3><p>Representing weights, activations or KV state with fewer bits can reduce memory pressure and sometimes improve speed. Benefits depend on hardware support and conversion costs. Measure end-to-end performance and quality, and identify which operations actually use the lower precision.</p><a href="#card-20">Understand precision ↗</a></div></section>
+        <section class="chapter" id="hardware"><div class="chapter-num">09</div><div><p class="chapter-tag">SYSTEMS, NOT SPECS</p><h3>Hardware &amp; System Architecture</h3><p>GPU compute is only one part of the path. HBM, host DRAM, storage, the CPU, NICs and fabric all shape performance. Faster kernels can expose memory or network bottlenecks; peak FLOPS alone cannot predict application performance.</p><a href="#card-23">Explore the hierarchy ↗</a></div></section>
+        <section class="chapter" id="agents"><div class="chapter-num">10</div><div><p class="chapter-tag">LONG-LIVED WORKLOADS</p><h3>Agentic AI Systems</h3><p>Agent workflows loop through model calls and tools, often growing and reusing context across turns or subagents. They put pressure on scheduling, cache persistence and long-context capacity. Shared KV can help only when useful reuse outweighs retrieval and coordination costs.</p><a href="#card-21">Explore agentic workloads ↗</a></div></section>
+        <section class="chapter" id="engineering"><div class="chapter-num">11</div><div><p class="chapter-tag">AI IN THE DEVELOPMENT LOOP</p><h3>AI Software Engineering</h3><p>Automated review can assist human reviewers. Judge the system by completed work, defects, review burden and recovery, not just generated lines or pull request count.</p><a href="#card-25">Explore AI-assisted code review ↗</a></div></section>
       </div>
 
       <section class="cards-section section-wrap" id="cards">
-        <div class="section-heading"><div><p class="section-kicker">THE REFERENCE DECK / 26 CARDS</p><h2>Technical cards.</h2><p>Build fluency with a repeatable chain: <strong>problem → mechanism → metric → trade-off → question.</strong> Explore each card’s explanation, examples and metrics, then use its question in an engineering conversation.</p></div></div>
+        <div class="section-heading"><div><p class="section-kicker">THE REFERENCE DECK / 25 CARDS</p><h2>Technical cards.</h2><p>Build fluency with a repeatable chain: <strong>problem → mechanism → metric → trade-off → question.</strong> Explore each card’s explanation, examples and metrics, then use its question in an engineering conversation.</p></div></div>
         <div class="search-wrap"><label for="card-search">Search the deck</label><input id="card-search" type="search" placeholder="Try “KV cache” or “latency”" autocomplete="off"><p id="search-status" role="status" aria-live="polite"></p></div>
         <div class="card-grid" id="card-grid">
           <article class="card source-card" id="card-1">
@@ -401,29 +401,7 @@
             <p>&quot;Why was this engine chosen for this exact model and customer workload?&quot;</p>
           </article>
           <article class="card source-card" id="card-16">
-            <h3>Card 16. Structured / Grammar-Constrained Generation</h3>
-            <h4>Problem</h4>
-            <p>Applications often need guaranteed structured output:</p>
-            <pre class="source-diagram">1     {
-2       &quot;customer&quot;: &quot;...&quot;,
-3       &quot;priority&quot;: &quot;...&quot;,
-4       &quot;status&quot;: &quot;...&quot;
-5     }</pre>
-            <p>Telling a model:</p>
-            <p>&quot;Please output valid JSON&quot;</p>
-            <p>doesn&#x27;t guarantee valid JSON.</p>
-            <h4>Mechanism</h4>
-            <p>Grammar-constrained decoding restricts which next tokens are legally selectable.</p>
-            <h4>Benefit</h4>
-            <p>More reliable:</p>
-            <ul><li>JSON</li><li>schema</li><li>tool calls</li><li>agent interfaces</li></ul>
-            <h4>Trade-off</h4>
-            <p>Constraint processing itself can affect serving performance.</p>
-            <h4 class="card-question-heading">Engineering question</h4>
-            <p>&quot;Is structured output enforced during decoding or validated/retried afterwards?&quot;</p>
-          </article>
-          <article class="card source-card" id="card-17">
-            <h3>Card 17. Triton and Custom Kernels</h3>
+            <h3>Card 16. Triton and Custom Kernels</h3>
             <h4>One sentence</h4>
             <p>A kernel is specialised GPU code implementing operations such as attention, matrix operations or normalisation.</p>
             <p>Framework operation:</p>
@@ -449,8 +427,8 @@
             <h4 class="card-question-heading">Engineering question</h4>
             <p>&quot;Is the uplift coming from higher compute utilisation, reduced memory traffic or fewer kernel launches?&quot;</p>
           </article>
-          <article class="card source-card" id="card-18">
-            <h3>Card 18. Roofline Analysis ⭐⭐</h3>
+          <article class="card source-card" id="card-17">
+            <h3>Card 17. Roofline Analysis ⭐⭐</h3>
             <h4>Purpose</h4>
             <p>Roofline analysis asks:</p>
             <p><strong>What fundamentally limits this operation: compute capability or memory bandwidth?</strong></p>
@@ -465,8 +443,8 @@
             <h4 class="card-remember-heading">Remember</h4>
             <p><strong>Roofline tells me which ceiling I&#x27;m hitting.</strong></p>
           </article>
-          <article class="card source-card" id="card-19">
-            <h3>Card 19. Speculative Decoding ⭐⭐⭐</h3>
+          <article class="card source-card" id="card-18">
+            <h3>Card 18. Speculative Decoding ⭐⭐⭐</h3>
             <p>Particularly relevant to the performance updates you regularly review.</p>
             <h4>Problem</h4>
             <p>Large-model decoding is expensive because tokens are produced sequentially.</p>
@@ -492,8 +470,8 @@
             <p>Ask:</p>
             <p><strong>&quot;What acceptance rate are we achieving and what&#x27;s the resulting end-to-end </strong> <strong>throughput/TPOT uplift?&quot;</strong></p>
           </article>
-          <article class="card source-card" id="card-20">
-            <h3>Card 20. Tokens per GPU vs Cost per Token ⭐⭐⭐</h3>
+          <article class="card source-card" id="card-19">
+            <h3>Card 19. Tokens per GPU vs Cost per Token ⭐⭐⭐</h3>
             <p>Marketing claims should be independently validated.</p>
             <h4>Infrastructure view</h4>
             <p><strong>tokens/sec/GPU</strong></p>
@@ -511,8 +489,8 @@
             <h4 class="card-question-heading">Engineering/business question</h4>
             <p>&quot;What&#x27;s cost per million tokens at the customer&#x27;s required latency target, rather than peak unconstrained throughput?&quot;</p>
           </article>
-          <article class="card source-card" id="card-21">
-            <h3>Card 21. Precision: BF16, FP8, FP4 ⭐⭐⭐</h3>
+          <article class="card source-card" id="card-20">
+            <h3>Card 20. Precision: BF16, FP8, FP4 ⭐⭐⭐</h3>
             <h4>Mental model</h4>
             <p>Lower precision means fewer bits representing numbers.</p>
             <p>Roughly:</p>
@@ -533,8 +511,8 @@
             <p>&quot;Which parts of the model are actually FP4, which remain BF16/FP8, and what accuracy and end-to-end performance were measured?&quot;</p>
             <p>That distinction matters directly to many of the benchmark discussions you encounter.</p>
           </article>
-          <article class="card source-card" id="card-22">
-            <h3>Card 22. Why Agents Change Inference ⭐⭐⭐</h3>
+          <article class="card source-card" id="card-21">
+            <h3>Card 21. Why Agents Change Inference ⭐⭐⭐</h3>
             <p>Traditional chatbot:</p>
             <pre class="source-diagram">1     question → answer → done</pre>
             <p>Agentic workload:</p>
@@ -561,8 +539,8 @@
             <h4 class="card-remember-heading">Remember</h4>
             <p><strong>Agentic inference turns KV cache from an implementation detail into infrastructure.</strong></p>
           </article>
-          <article class="card source-card" id="card-23">
-            <h3>Card 23. Shared / Global KV Pools ⭐⭐⭐</h3>
+          <article class="card source-card" id="card-22">
+            <h3>Card 22. Shared / Global KV Pools ⭐⭐⭐</h3>
             <h4>Traditional model</h4>
             <p>Each server owns the KV cache created locally.</p>
             <pre class="source-diagram">1     Server A    Server B
@@ -582,8 +560,8 @@
             <h4 class="card-question-heading">TPM question</h4>
             <p><strong>&quot;What&#x27;s the marginal benefit in useful hit rate versus the additional network and </strong> <strong>storage latency?&quot;</strong></p>
           </article>
-          <article class="card source-card" id="card-24">
-            <h3>Card 24. HBM vs DRAM vs NVMe ⭐⭐⭐</h3>
+          <article class="card source-card" id="card-23">
+            <h3>Card 23. HBM vs DRAM vs NVMe ⭐⭐⭐</h3>
             <p>This should become second nature.</p>
             <div class="table-wrap"><table><thead><tr><th scope="col">Tier</th><th scope="col">Relative speed</th><th scope="col">Relative capacity</th><th scope="col">Typical KV role</th></tr></thead><tbody><tr><td>HBM</td><td>Fastest</td><td>Smallest/most expensive</td><td>Active/hot KV</td></tr><tr><td>Host DRAM</td><td>Slower</td><td>Larger</td><td>Warm/offloaded KV</td></tr><tr><td>NVMe</td><td>Much slower</td><td>Very large</td><td>Persisted/cold KV</td></tr></tbody></table></div>
             <p>Think:</p>
@@ -592,8 +570,8 @@
             <h4 class="card-question-heading">Engineering question</h4>
             <p>&quot;What&#x27;s the observed latency to restore KV from each tier, and when is recomputation cheaper?&quot;</p>
           </article>
-          <article class="card source-card" id="card-25">
-            <h3>Card 25. MI300/MI350/MI355X-class System Thinking</h3>
+          <article class="card source-card" id="card-24">
+            <h3>Card 24. MI300/MI350/MI355X-class System Thinking</h3>
             <p>When engineering gives you a hardware result, don&#x27;t think only:</p>
             <p>GPU.</p>
             <p>Think:</p>
@@ -619,9 +597,8 @@
             <h4 class="card-remember-heading">Remember</h4>
             <p><strong>Fixing one bottleneck often reveals the next one.</strong></p>
           </article>
-          <article class="card source-card" id="card-26">
-            <span id="card-27"></span>
-            <h3>Card 26. AI-Assisted Code Review</h3>
+          <article class="card source-card" id="card-25">
+            <h3>Card 25. AI-Assisted Code Review</h3>
             <p>Move substantial mechanical review work to automated systems while keeping human review risk-based.</p>
             <h4>Conceptual architecture</h4>
             <pre class="source-diagram">1     AI writes/change
@@ -675,7 +652,7 @@
         <div><dt>Critical path</dt><dd>The sequence of dependent work that determines completion time; only exposed delays extend it.</dd></div>
       </dl></section>
 
-      <section class="essentials section-wrap"><div><p class="section-kicker">THE TEN TO REMEMBER</p><h2>Keep the system<br>in your head.</h2><p>Do not memorise all 26 equally. If you can explain these ten and ask the right follow-up question, you have a strong foundation.</p></div><ol><li><a href="#card-1">Prefill vs decode</a></li><li><a href="#card-3">TTFT vs TPOT vs throughput</a></li><li><a href="#card-2">Compute-bound vs memory-bound</a></li><li><a href="#card-4">KV cache</a></li><li><a href="#card-6">Prefix caching and hit rate</a></li><li><a href="#card-5">PagedAttention</a></li><li><a href="#card-24">KV tiering: HBM → DRAM → NVMe</a></li><li><a href="#card-11">Prefill–decode disaggregation</a></li><li><a href="#card-13">RDMA and overlapping KV transfer</a></li><li><a href="#card-20">Performance → tokens/GPU → cost/token</a></li></ol></section>
+      <section class="essentials section-wrap"><div><p class="section-kicker">THE TEN TO REMEMBER</p><h2>Keep the system<br>in your head.</h2><p>Do not memorise all 25 equally. If you can explain these ten and ask the right follow-up question, you have a strong foundation.</p></div><ol><li><a href="#card-1">Prefill vs decode</a></li><li><a href="#card-3">TTFT vs TPOT vs throughput</a></li><li><a href="#card-2">Compute-bound vs memory-bound</a></li><li><a href="#card-4">KV cache</a></li><li><a href="#card-6">Prefix caching and hit rate</a></li><li><a href="#card-5">PagedAttention</a></li><li><a href="#card-23">KV tiering: HBM → DRAM → NVMe</a></li><li><a href="#card-11">Prefill–decode disaggregation</a></li><li><a href="#card-13">RDMA and overlapping KV transfer</a></li><li><a href="#card-19">Performance → tokens/GPU → cost/token</a></li></ol></section>
       <footer><span>AI SYSTEMS FLUENCY</span><p>Based on the supplied technical learning plan. Built for informed questions, not memorised claims.</p><a href="#top">Back to top ↑</a></footer>
     </main>
   </div>
