@@ -2,6 +2,9 @@ const search = document.querySelector('#card-search');
 const cards = [...document.querySelectorAll('#card-grid .card')];
 const status = document.querySelector('#search-status');
 const noResults = document.querySelector('#no-results');
+const exampleTrigger = document.querySelector('.example-trigger');
+
+exampleTrigger.addEventListener('click', () => exampleTrigger.focus());
 
 search.addEventListener('input', () => {
   const query = search.value.trim().toLocaleLowerCase();
