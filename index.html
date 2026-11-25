@@ -246,7 +246,7 @@
             <h4>Problem</h4>
             <p>KV cache consumes enormous amounts of memory.</p>
             <h4>Mechanism</h4>
-            <p>Represent KV values using fewer bits. <span class="example-hint"><button type="button" class="example-trigger" aria-controls="kv-quantisation-example" aria-describedby="kv-quantisation-example" aria-expanded="false">Example ⓘ <span class="example-instruction">(hover)</span></button><span class="example-popover" id="kv-quantisation-example" role="tooltip" hidden><span>Each key and value element is stored using a lower-precision number format.</span><span>As a rough illustration, changing the same KV elements from 16-bit BF16 to 8-bit FP8 or INT8 halves their raw value storage; a 4-bit representation uses one quarter. Actual savings are smaller after scales, metadata, packing, and alignment.</span><span>Quantisation can introduce approximation error and conversion or kernel costs. Check output quality and end-to-end performance on the target model and hardware.</span></span></span></p>
+            <p>Represent KV values using fewer bits.</p>
             <p>Conceptually:</p>
             <pre class="source-diagram">1     BF16 KV
 2        ↓
@@ -261,7 +261,7 @@
             <ul><li>accuracy impacts</li><li>conversion overhead</li><li>kernel complexity</li><li>compatibility issues</li></ul>
             <h4 class="card-question-heading">Engineering question</h4>
             <p>&quot;What memory reduction do we get, and what quality or conversion overhead do we pay?&quot;</p>
-            <h4 class="card-remember-heading">Remember</h4>
+            <h4 class="card-remember-heading">Remember <span class="example-hint"><button type="button" class="example-trigger" aria-controls="kv-quantisation-example" aria-describedby="kv-quantisation-example" aria-expanded="false">Example ⓘ <span class="example-instruction">(hover)</span></button><span class="example-popover" id="kv-quantisation-example" role="tooltip" hidden><span>Suppose a workload stores 16 GB of KV using 16-bit BF16 values. Storing the same values at 8 bits would ideally take about 8 GB, or about 4 GB at 4 bits, before scales, metadata, packing, and alignment overhead.</span><span>That smaller cache may leave room for more active conversations, but the model still processes the same tokens. Conversion work or less efficient kernels can mean generation is no faster—or even slower.</span></span></span></h4>
             <p><strong>KV quantisation makes conversation memory smaller, not necessarily computation </strong> <strong>faster.</strong></p>
           </article>
           <article class="card source-card" id="card-10">
