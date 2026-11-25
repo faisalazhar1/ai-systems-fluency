@@ -206,6 +206,7 @@
 4     14 missing
 5
 6     Hit rate = 86%</pre>
+            <p>This example counts <strong>requests</strong>. Hit rates can also count tokens or blocks, so check the denominator before comparing results. See the <a href="https://docs.vllm.ai/en/v0.27.1/design/metrics/">vLLM metrics documentation</a> for its token-level prefix-cache metrics.</p>
             <h4>Why it matters</h4>
             <p>Higher useful hit rate can mean:</p>
             <p><strong>fewer prefill computations → less GPU work → lower latency → higher effective </strong> <strong>throughput</strong></p>
@@ -227,6 +228,9 @@
 5             ↓
 6           NVMe
 7     SLOWER / LARGER</pre>
+            <p><strong>In brief:</strong></p>
+            <ul><li><strong>GPU HBM:</strong> Fast memory on the GPU, used for active KV state; capacity is limited and shared with model weights.</li><li><strong>CPU DRAM:</strong> Host memory with more capacity, but transferring KV back to the GPU takes time.</li><li><strong>NVMe:</strong> SSD storage that can hold more cached state, but is generally slower to retrieve than DRAM.</li></ul>
+            <p>Less-active KV can be moved to a lower tier and restored to GPU HBM when needed. The tiers used and movement policy depend on the serving system.</p>
             <p>Systems such as <strong>LMCache</strong> manage KV state beyond GPU HBM so useful state can be retained and restored later.</p>
             <h4>Critical trade-off</h4>
             <p>Retrieving cached KV must be cheaper than recomputing it.</p>
