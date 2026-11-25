@@ -2,59 +2,70 @@ const search = document.querySelector('#card-search');
 const cards = [...document.querySelectorAll('#card-grid .card')];
 const status = document.querySelector('#search-status');
 const noResults = document.querySelector('#no-results');
-const exampleTrigger = document.querySelector('.example-trigger');
-const exampleHint = document.querySelector('.example-hint');
-const examplePopover = document.querySelector('#bandwidth-example');
-let examplePinned = false;
+const examples = [...document.querySelectorAll('.example-hint')].map((hint) => ({
+  hint,
+  trigger: hint.querySelector('.example-trigger'),
+  popover: hint.querySelector('.example-popover'),
+  pinned: false,
+}));
 
-function showExample(show) {
-  examplePopover.hidden = !show;
-  exampleTrigger.setAttribute('aria-expanded', String(show));
+function showExample(example, show) {
+  example.popover.hidden = !show;
+  example.trigger.setAttribute('aria-expanded', String(show));
   if (show) {
-    examplePopover.style.left = '';
-    examplePopover.classList.remove('above', 'centered');
+    example.popover.style.left = '';
+    example.popover.classList.remove('above', 'centered');
   }
   if (show && window.innerWidth > 580) {
-    let bounds = examplePopover.getBoundingClientRect();
+    let bounds = example.popover.getBoundingClientRect();
     if (bounds.right > window.innerWidth - 16) {
-      examplePopover.style.left = `${window.innerWidth - 16 - bounds.right}px`;
+      example.popover.style.left = `${window.innerWidth - 16 - bounds.right}px`;
     }
     if (bounds.bottom > window.innerHeight - 16) {
-      examplePopover.classList.add('above');
-      bounds = examplePopover.getBoundingClientRect();
+      example.popover.classList.add('above');
+      bounds = example.popover.getBoundingClientRect();
       if (bounds.top < 16) {
-        examplePopover.classList.remove('above');
-        examplePopover.classList.add('centered');
-        examplePopover.style.left = '';
+        example.popover.classList.remove('above');
+        example.popover.classList.add('centered');
+        example.popover.style.left = '';
       }
     }
   }
 }
 
-exampleHint.addEventListener('pointerenter', (event) => {
-  if (event.pointerType === 'mouse') showExample(true);
-});
-exampleHint.addEventListener('pointerleave', (event) => {
-  if (event.pointerType === 'mouse' && !examplePinned && document.activeElement !== exampleTrigger) showExample(false);
-});
-exampleTrigger.addEventListener('focus', () => showExample(true));
-exampleTrigger.addEventListener('blur', () => {
-  if (!examplePinned && !exampleHint.matches(':hover')) showExample(false);
-});
-exampleTrigger.addEventListener('click', () => {
-  examplePinned = !examplePinned;
-  showExample(examplePinned);
-});
+for (const example of examples) {
+  example.hint.addEventListener('pointerenter', (event) => {
+    if (event.pointerType === 'mouse') showExample(example, true);
+  });
+  example.hint.addEventListener('pointerleave', (event) => {
+    if (event.pointerType === 'mouse' && !example.pinned && document.activeElement !== example.trigger) {
+      showExample(example, false);
+    }
+  });
+  example.trigger.addEventListener('focus', () => showExample(example, true));
+  example.trigger.addEventListener('blur', () => {
+    if (!example.pinned && !example.hint.matches(':hover')) showExample(example, false);
+  });
+  example.trigger.addEventListener('click', () => {
+    example.pinned = !example.pinned;
+    showExample(example, example.pinned);
+  });
+}
+
 document.addEventListener('pointerdown', (event) => {
-  if (!exampleHint.contains(event.target)) {
-    examplePinned = false;
-    showExample(false);
+  for (const example of examples) {
+    if (!example.hint.contains(event.target)) {
+      example.pinned = false;
+      showExample(example, false);
+    }
   }
 });
 document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape') {
-    examplePinned = false;
-    showExample(false);
+    for (const example of examples) {
+      example.pinned = false;
+      showExample(example, false);
+    }
   }
 });
 

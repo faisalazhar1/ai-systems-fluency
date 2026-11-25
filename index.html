@@ -246,7 +246,7 @@
             <h4>Problem</h4>
             <p>KV cache consumes enormous amounts of memory.</p>
             <h4>Mechanism</h4>
-            <p>Represent KV values using fewer bits.</p>
+            <p>Represent KV values using fewer bits. <span class="example-hint"><button type="button" class="example-trigger" aria-controls="kv-quantisation-example" aria-expanded="false">Example ⓘ <span class="example-instruction">(hover)</span></button><span class="example-popover" id="kv-quantisation-example" role="tooltip" hidden><span>Each key and value element is stored using a lower-precision number format.</span><span>As a rough illustration, changing the same KV elements from 16-bit BF16 to 8-bit FP8 or INT8 halves their raw value storage; a 4-bit representation uses one quarter. Actual savings are smaller after scales, metadata, packing, and alignment.</span><span>Quantisation can introduce approximation error and conversion or kernel costs. Check output quality and end-to-end performance on the target model and hardware.</span></span></span></p>
             <p>Conceptually:</p>
             <pre class="source-diagram">1     BF16 KV
 2        ↓
