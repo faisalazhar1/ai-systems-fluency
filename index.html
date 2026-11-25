@@ -62,13 +62,13 @@
         <section class="chapter" id="networking"><div class="chapter-num">06</div><div><p class="chapter-tag">MOVING STATE</p><h3>GPU Networking &amp; Data Movement</h3><p>Moving KV between workers or memory tiers consumes bandwidth and time. RDMA and GPU-direct paths can reduce host involvement; overlapping transfer with computation can hide some of its cost. Measure exposed communication, not just raw transfer time.</p><a href="#card-13">Explore data movement ↗</a></div></section>
         <section class="chapter" id="kernels"><div class="chapter-num">07</div><div><p class="chapter-tag">THE EXECUTION LAYER</p><h3>Kernels &amp; Optimisation</h3><p>Custom and fused kernels can reduce memory traffic and launch overhead. Roofline analysis relates arithmetic intensity to compute and bandwidth ceilings; speculative decoding uses cheaper proposals to potentially advance generation faster. Each requires workload-specific measurement.</p><a href="#card-16">Explore optimisation ↗</a></div></section>
         <section class="chapter" id="precision"><div class="chapter-num">08</div><div><p class="chapter-tag">BITS, SPEED &amp; QUALITY</p><h3>Precision &amp; Quantisation</h3><p>Representing weights, activations or KV state with fewer bits can reduce memory pressure and sometimes improve speed. Benefits depend on hardware support and conversion costs. Measure end-to-end performance and quality, and identify which operations actually use the lower precision.</p><a href="#card-20">Understand precision ↗</a></div></section>
-        <section class="chapter" id="hardware"><div class="chapter-num">09</div><div><p class="chapter-tag">SYSTEMS, NOT SPECS</p><h3>Hardware &amp; System Architecture</h3><p>GPU compute is only one part of the path. HBM, host DRAM, storage, the CPU, NICs and fabric all shape performance. Faster kernels can expose memory or network bottlenecks; peak FLOPS alone cannot predict application performance.</p><a href="#card-23">Explore the hierarchy ↗</a></div></section>
+        <section class="chapter" id="hardware"><div class="chapter-num">09</div><div><p class="chapter-tag">SYSTEMS, NOT SPECS</p><h3>Hardware &amp; System Architecture</h3><p>GPU compute is only one part of the path. HBM, host DRAM, storage, the CPU, NICs and fabric all shape performance. Faster kernels can expose memory or network bottlenecks; peak FLOPS alone cannot predict application performance.</p><a href="#card-23">Explore the memory tiers ↗</a></div></section>
         <section class="chapter" id="agents"><div class="chapter-num">10</div><div><p class="chapter-tag">LONG-LIVED WORKLOADS</p><h3>Agentic AI Systems</h3><p>Agent workflows loop through model calls and tools, often growing and reusing context across turns or subagents. They put pressure on scheduling, cache persistence and long-context capacity. Shared KV can help only when useful reuse outweighs retrieval and coordination costs.</p><a href="#card-21">Explore agentic workloads ↗</a></div></section>
-        <section class="chapter" id="engineering"><div class="chapter-num">11</div><div><p class="chapter-tag">AI IN THE DEVELOPMENT LOOP</p><h3>AI Software Engineering</h3><p>Automated review can assist human reviewers. Judge the system by completed work, defects, review burden and recovery, not just generated lines or pull request count.</p><a href="#card-25">Explore AI-assisted code review ↗</a></div></section>
+        <section class="chapter" id="engineering"><div class="chapter-num">11</div><div><p class="chapter-tag">AI IN THE DEVELOPMENT LOOP</p><h3>AI Software Engineering</h3><p>AI can support software development, but its value depends on correctness, reliability and fit with real engineering workflows.</p></div></section>
       </div>
 
       <section class="cards-section section-wrap" id="cards">
-        <div class="section-heading"><div><p class="section-kicker">THE REFERENCE DECK / 25 CARDS</p><h2>Technical cards.</h2><p>Build fluency with a repeatable chain: <strong>problem → mechanism → metric → trade-off → question.</strong> Explore each card’s explanation, examples and metrics, then use its question in an engineering conversation.</p></div></div>
+        <div class="section-heading"><div><p class="section-kicker">THE REFERENCE DECK / 23 CARDS</p><h2>Technical cards.</h2><p>Build fluency with a repeatable chain: <strong>problem → mechanism → metric → trade-off → question.</strong> Explore each card’s explanation, examples and metrics, then use its question in an engineering conversation.</p></div></div>
         <div class="search-wrap"><label for="card-search">Search the deck</label><input id="card-search" type="search" placeholder="Try “KV cache” or “latency”" autocomplete="off"><p id="search-status" role="status" aria-live="polite"></p></div>
         <div class="card-grid" id="card-grid">
           <article class="card source-card" id="card-1">
@@ -570,63 +570,6 @@
             <h4 class="card-question-heading">Engineering question</h4>
             <p>&quot;What&#x27;s the observed latency to restore KV from each tier, and when is recomputation cheaper?&quot;</p>
           </article>
-          <article class="card source-card" id="card-24">
-            <h3>Card 24. MI300/MI350/MI355X-class System Thinking</h3>
-            <p>When engineering gives you a hardware result, don&#x27;t think only:</p>
-            <p>GPU.</p>
-            <p>Think:</p>
-            <pre class="source-diagram">1     MODEL
-2      ↓
-3     SERVING ENGINE
-4      ↓
-5     KERNELS
-6      ↓
-7     GPU compute
-8      ↕
-9     HBM
-10      ↕
-11     CPU / DRAM
-12      ↕
-13     NIC / fabric
-14      ↕
-15     remote GPUs / storage</pre>
-            <p>Performance is a <strong>system result</strong>.</p>
-            <p>A bottleneck can therefore migrate.</p>
-            <p>Example:</p>
-            <p>1. optimise kernel 2. GPU compute improves 3. memory bandwidth becomes limiting 4. improve cache 5. networking becomes limiting</p>
-            <h4 class="card-remember-heading">Remember</h4>
-            <p><strong>Fixing one bottleneck often reveals the next one.</strong></p>
-          </article>
-          <article class="card source-card" id="card-25">
-            <h3>Card 25. AI-Assisted Code Review</h3>
-            <p>Move substantial mechanical review work to automated systems while keeping human review risk-based.</p>
-            <h4>Conceptual architecture</h4>
-            <pre class="source-diagram">1     AI writes/change
-2           ↓
-3     local tests + lint
-4           ↓
-5     automated AI review
-6           ↓
-7     security checks
-8           ↓
-9     risk classifier
-10           ↓
-11     human review where necessary
-12           ↓
-13     deploy behind guardrails
-14           ↓
-15     observe / rollback</pre>
-            <h4>TPM significance</h4>
-            <p>The goal should not simply be:</p>
-            <p><strong>more Pull Requests</strong></p>
-            <p>but:</p>
-            <p><strong>higher engineering throughput without a corresponding rise in defects or operational risk.</strong></p>
-            <h4 class="card-question-heading">Questions to ask</h4>
-            <p>&quot;What happened to merged change throughput?&quot;</p>
-            <p>&quot;What happened to revert/rollback rate?&quot;</p>
-            <p>&quot;Which risk classes still require human approval?&quot;</p>
-            <p>That&#x27;s much more meaningful than asking whether engineers are &quot;using AI&quot;.</p>
-          </article>
         </div>
         <p id="no-results" class="no-results" hidden>No cards match that search. Try another term.</p>
       </section>
@@ -652,7 +595,7 @@
         <div><dt>Critical path</dt><dd>The sequence of dependent work that determines completion time; only exposed delays extend it.</dd></div>
       </dl></section>
 
-      <section class="essentials section-wrap"><div><p class="section-kicker">THE TEN TO REMEMBER</p><h2>Keep the system<br>in your head.</h2><p>Do not memorise all 25 equally. If you can explain these ten and ask the right follow-up question, you have a strong foundation.</p></div><ol><li><a href="#card-1">Prefill vs decode</a></li><li><a href="#card-3">TTFT vs TPOT vs throughput</a></li><li><a href="#card-2">Compute-bound vs memory-bound</a></li><li><a href="#card-4">KV cache</a></li><li><a href="#card-6">Prefix caching and hit rate</a></li><li><a href="#card-5">PagedAttention</a></li><li><a href="#card-23">KV tiering: HBM → DRAM → NVMe</a></li><li><a href="#card-11">Prefill–decode disaggregation</a></li><li><a href="#card-13">RDMA and overlapping KV transfer</a></li><li><a href="#card-19">Performance → tokens/GPU → cost/token</a></li></ol></section>
+      <section class="essentials section-wrap"><div><p class="section-kicker">THE TEN TO REMEMBER</p><h2>Keep the system<br>in your head.</h2><p>Do not memorise all 23 equally. If you can explain these ten and ask the right follow-up question, you have a strong foundation.</p></div><ol><li><a href="#card-1">Prefill vs decode</a></li><li><a href="#card-3">TTFT vs TPOT vs throughput</a></li><li><a href="#card-2">Compute-bound vs memory-bound</a></li><li><a href="#card-4">KV cache</a></li><li><a href="#card-6">Prefix caching and hit rate</a></li><li><a href="#card-5">PagedAttention</a></li><li><a href="#card-23">KV tiering: HBM → DRAM → NVMe</a></li><li><a href="#card-11">Prefill–decode disaggregation</a></li><li><a href="#card-13">RDMA and overlapping KV transfer</a></li><li><a href="#card-19">Performance → tokens/GPU → cost/token</a></li></ol></section>
       <footer><span>AI SYSTEMS FLUENCY</span><p>Based on the supplied technical learning plan. Built for informed questions, not memorised claims.</p><a href="#top">Back to top ↑</a></footer>
     </main>
   </div>
