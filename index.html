@@ -425,7 +425,7 @@
             <p><strong>How efficiently can the GPUs exchange the intermediate results required by the parallelisation strategy?</strong></p>
             <h4>What determines the cost?</h4>
             <p>Think:</p>
-            <p><strong>message size × communication frequency × effective interconnect performance × synchronization exposure</strong></p>
+            <p><strong>message size × communication frequency × effective interconnect performance × synchronization exposure</strong> <span class="example-hint"><button type="button" class="example-trigger" aria-controls="collective-cost-example" aria-describedby="collective-cost-example" aria-expanded="false">Example ⓘ <span class="example-instruction">(hover)</span></button><span class="example-popover" id="collective-cost-example" role="tooltip" hidden><span>Suppose a workload runs <strong>100 collectives</strong>, each taking <strong>1 ms</strong>. Without overlap, they add roughly <strong>100 ms</strong> to the critical path. If independent computation hides 0.6 ms of each collective, only about <strong>40 ms</strong> is exposed.</span><span>Larger messages or more frequent collectives can increase the cost; higher effective bandwidth can reduce transfer time. Latency, topology, and waiting for other GPUs also matter. The expression is a list of factors, <strong>not a multiplication formula</strong>.</span></span></span></p>
             <p>Relevant variables include:</p>
             <ul><li>Tensor Parallel degree</li><li>token count</li><li>hidden dimension</li><li>datatype</li><li>collective frequency</li><li>topology</li><li>effective bandwidth</li><li>communication latency</li><li>how much communication overlaps computation</li></ul>
             <h4 class="card-question-heading">TPM question</h4>
@@ -506,7 +506,7 @@
           <article class="card source-card" id="card-18">
             <h3>Card 18. TP vs EP vs DP: Choose the Communication Pattern ⭐⭐⭐</h3>
             <p>This is the synthesis card I'd really want you to retain.</p>
-            <div class="table-wrap"><table><thead><tr><th scope="col">Strategy</th><th scope="col">What's divided?</th><th scope="col">Communication intuition</th><th scope="col">Main concern</th></tr></thead><tbody><tr><th scope="row">TP</th><td>Tensor/model operation</td><td>GPUs combine partial activation results</td><td>Frequent collectives</td></tr><tr><th scope="row">EP</th><td>Experts</td><td>Tokens routed to selected experts</td><td>All-to-All + imbalance</td></tr><tr><th scope="row">DP</th><td>Workload/data</td><td>Each replica handles local work</td><td>Replication + later synchronization where required</td></tr></tbody></table></div>
+            <div class="table-wrap"><table><thead><tr><th scope="col">Strategy</th><th scope="col">What's divided?</th><th scope="col">Communication intuition</th><th scope="col">Main concern</th></tr></thead><tbody><tr><th scope="row">TP</th><td>Tensor/model operation</td><td>GPUs combine partial activation results</td><td>Frequent collectives</td></tr><tr><th scope="row">EP</th><td>Experts</td><td>Tokens routed to selected experts</td><td>All-to-All + imbalance</td></tr><tr><th scope="row">DP</th><td>Workload/data</td><td>Each replica handles local work</td><td>Replication and memory cost; synchronization or communication may be required by the wider architecture.</td></tr></tbody></table></div>
             <h4>Mental model</h4>
             <p><strong>Tensor Parallelism</strong></p>
             <p>“Let's divide one big calculation.”</p>
